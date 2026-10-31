@@ -1,0 +1,26 @@
+<footer id="contact">
+  <div class="footer-content">
+    <section class="footer-section" aria-labelledby="footer-contact">
+      <h2 id="footer-contact">{{ copy().contact }}</h2>
+      <p>{{ copy().email }}: <a class="footer-email" href="mailto:Haf&#64;holyarmyfellowship.org">Haf&#64;holyarmyfellowship.org</a></p>
+    </section>
+    <section class="footer-section" aria-labelledby="footer-social">
+      <h2 id="footer-social">{{ copy().connect }}</h2>
+      <div class="social-links">
+        <a href="https://www.youtube.com/@holyarmyfellowship4726" [attr.aria-label]="copy().youtube"
+          target="_blank" rel="noopener noreferrer">
+          <i class="fab fa-youtube" aria-hidden="true"></i>
+        </a>
+      </div>
+    </section>
+    <section class="footer-section" aria-labelledby="footer-location">
+      <h2 id="footer-location">{{ copy().location }}</h2>
+      <div class="map-container">
+        <iframe [title]="copy().mapTitle" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3825.2903131521607!2d81.15606487460877!3d16.511434927449184!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a361874a5c9d229%3A0xb56ba61ede1af540!2sH.A.F%20Church%20Mandavalli!5e0!3m2!1sen!2sin!4v1737304566845!5m2!1sen!2sin"
+          allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <a class="directions-link" href="https://www.google.com/maps/search/?api=1&amp;query=H.A.F%20Church%20Mandavalli"
+        target="_blank" rel="noopener noreferrer">{{ copy().directions }}</a>
+    </section>
+  </div>
+</footer>

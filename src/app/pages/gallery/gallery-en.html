@@ -1,0 +1,54 @@
+<haf-site-header />
+
+    
+
+    <main id="main-content" tabindex="-1" class="gallery-main">
+      <section class="gallery-hero">
+        <div class="gallery-hero-content">
+          <h1>Our Journey in Pictures</h1>
+          <p>Capturing precious moments of faith, fellowship, and divine blessings</p>
+        </div>
+      </section>
+      
+      <section class="gallery-filter">
+        <div class="filter-container">
+          
+          <button class="filter-btn active" data-filter="all" (click)="filter.set('all')" [class.active]="filter() === 'all'">
+            <i class="fas fa-th"></i> All Photos
+          </button>
+          <button class="filter-btn" data-filter="foundation" (click)="filter.set('foundation')" [class.active]="filter() === 'foundation'">
+            <i class="fas fa-hammer"></i> Foundation of Faith
+          </button>
+        </div>
+      </section>
+
+      <section class="gallery-content">
+        <div class="gallery-grid" id="galleryGrid">@for (image of filteredImages(); track image.src; let index = $index) {
+      <div class="gallery-item" [attr.data-category]="image.category" [attr.data-index]="index"
+        role="button" tabindex="0" (click)="open(index)" (keydown.enter)="open(index)" (keydown.space)="$event.preventDefault(); open(index)">
+        <div class="gallery-item-image"><img [src]="image.src" alt="Church construction progress, photo {{ index + 1 }}"
+          [attr.loading]="index < 4 ? 'eager' : 'lazy'" decoding="async" width="400" height="300"></div>
+      </div>
+    }</div>
+      </section>
+    </main>
+
+    
+    <div id="lightbox" class="lightbox" [class.active]="selectedIndex() !== null" (click)="closeOnBackdrop($event)" role="dialog" aria-modal="true" [attr.aria-hidden]="selectedIndex() === null" aria-label="Gallery Full Image">
+      <div class="lightbox-content">
+        <button class="close-lightbox" aria-label="Close lightbox" (click)="close()">
+          <i class="fas fa-times"></i>
+        </button>
+        <button class="lightbox-prev" aria-label="Previous image" (click)="navigate(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-next" aria-label="Next image" (click)="navigate(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="lightbox-image-container">
+          <img id="lightbox-img" alt="Gallery Full Image" [attr.src]="selectedImage()?.src ?? null">
+        </div>
+      </div>
+    </div>
+
+    <haf-site-footer />

@@ -1,0 +1,101 @@
+<haf-site-header />
+
+    
+
+    <main id="main-content" tabindex="-1">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Welcome to Holy Army Fellowship</h1>
+        <p>
+          Join us in worship and fellowship as we grow together in faith and
+          service
+        </p>
+        <div class="hero-buttons">
+          <a [routerLink]="[]" fragment="contact" class="cta-button">Join Us This Sunday</a>
+          <a class="cta-button" title="Change Language" routerLink="/language">
+            <i class="fas fa-language"></i>
+            Select Language
+          </a>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Our Mission</h2>
+        <p class="section-subtitle">
+          To spread God's love and build a community of faithful servants
+          dedicated to worship, fellowship, and service.
+        </p>
+        <div class="grid">
+          <div class="card">
+            <i class="fas fa-pray"></i>
+            <h3>Worship</h3>
+            <p>
+              Experience powerful worship services that bring us closer to God
+            </p>
+          </div>
+          <div class="card">
+            <i class="fas fa-hands-helping"></i>
+            <h3>Community</h3>
+            <p>
+              Be part of a loving community that supports and uplifts one
+              another
+            </p>
+          </div>
+          <div class="card">
+            <i class="fas fa-heart"></i>
+            <h3>Service</h3>
+            <p>Serve others and make a positive impact in our community</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-light">
+      <div class="container">
+        <h2 class="section-title">Upcoming Events</h2>
+        <p class="section-subtitle">
+          Join us for these special gatherings and strengthen your faith journey
+        </p>
+        <div class="grid">
+          <div class="card">
+            <h3>Sunday Service</h3>
+            <p>Every Sunday at 10:00 AM to 1:00 PM</p>
+            <div class="calendar-buttons">
+              <button type="button" class="calendar-btn" hafCalendar="google" calendarService="sunday">
+                <i class="fab fa-google"></i> Add to Google Calendar
+              </button>
+              <button type="button" class="calendar-btn" hafCalendar="download" calendarService="sunday">
+                <i class="far fa-calendar-plus"></i> Download for Other
+                Calendars
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Second Saturday Service</h3>
+            <p>Second Saturdays at 9:30 AM to 2:30 PM</p>
+            <div class="calendar-buttons">
+              <button type="button" class="calendar-btn" hafCalendar="google" calendarService="second-saturday">
+                <i class="fab fa-google"></i> Add to Google Calendar
+              </button>
+              <button type="button" class="calendar-btn" hafCalendar="download" calendarService="second-saturday">
+                <i class="far fa-calendar-plus"></i> Download for Other
+                Calendars
+              </button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Retreats</h3>
+            <p>
+              
+              We will update the dates for the next retreat soon. Stay tuned!
+            </p>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+
+    </main>
+
+    <haf-site-footer />

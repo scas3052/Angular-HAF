@@ -1,0 +1,75 @@
+<haf-site-header />
+
+    
+
+    <haf-prayer-toast />
+
+    <div class="container">
+        <aside class="verses-sidebar">
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:1</div>
+                <p class="verse-text">యేసు తన పన్నెండు మంది శిష్యులను పిలిచి, అపవిత్రాత్మలను వెళ్లగొట్టడానికి మరియు ప్రతి రోగాన్ని, వ్యాధిని నయం చేయడానికి వారికి అధికారం ఇచ్చాడు.</p>
+            </div>
+            
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:2</div>
+                <p class="verse-text">పన్నెండు మంది అపొస్తలుల పేర్లు: మొదటిది సీమోను (పేతురు అని పిలువబడేవాడు) మరియు అతని సోదరుడు ఆంద్రెయ; జెబెదయి కుమారుడు యాకోబు, మరియు అతని సోదరుడు యోహాను;</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:3</div>
+                <p class="verse-text">ఫిలిప్పు మరియు బర్తొలొమయి; తోమా మరియు పన్ను వసూలు చేసే మత్తయి; అల్ఫయి కుమారుడు యాకోబు, మరియు తద్దయి;</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:4</div>
+                <p class="verse-text">కనానీయుడైన సీమోను మరియు ఆయనను అప్పగించిన ఇస్కరియోతు యూదా.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:5</div>
+                <p class="verse-text">యేసు ఈ పన్నెండు మందిని పంపుతూ ఈ ఆదేశాలు ఇచ్చాడు: "అన్యజనుల మార్గంలో వెళ్లవద్దు, సమరయుల ఏ పట్టణంలోనూ ప్రవేశించవద్దు.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:6</div>
+                <p class="verse-text">బదులుగా ఇశ్రాయేలు ఇంటి తప్పిపోయిన గొర్రెల వద్దకు వెళ్లండి.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:7</div>
+                <p class="verse-text">మీరు వెళ్తూ ఈ సందేశాన్ని ప్రకటించండి: 'పరలోక రాజ్యం సమీపించింది.'</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:8</div>
+                <p class="verse-text">రోగులను స్వస్థపరచండి, చనిపోయిన వారిని లేపండి, కుష్టురోగులను శుద్ధిచేయండి, దయ్యాలను వెళ్లగొట్టండి. ఉచితంగా పొందారు, ఉచితంగా ఇవ్వండి.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">మత్తయి 10:9</div>
+                <p class="verse-text">మీ నడికట్టులో బంగారం గాని, వెండి గాని, రాగి నాణేలు గాని తీసుకువెళ్లవద్దు.</p>
+            </div>
+        </aside>
+
+        <main id="main-content" tabindex="-1" class="form-container">
+            <h1>ప్రార్థన అభ్యర్థన</h1>
+            <p class="subtitle">"అడగండి ఇవ్వబడును; వెదకండి దొరకును; తట్టండి తెరువబడును."</p>
+            
+            
+            <div class="request-method-buttons">
+                <button class="method-btn active" (click)="prayer.method.set('whatsapp')" [class.active]="prayer.method() === 'whatsapp'">
+                    <i class="fab fa-whatsapp"></i>
+                    వాట్సాప్ ద్వారా పంపండి
+                </button>
+                <button class="method-btn" (click)="prayer.method.set('email')" [class.active]="prayer.method() === 'email'">
+                    <i class="fas fa-envelope"></i>
+                    ఇమెయిల్ ద్వారా పంపండి
+                </button>
+            </div>
+
+            <haf-prayer-form [copy]="copy" />
+        </main>
+    </div>
+
+    <haf-site-footer />

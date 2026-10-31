@@ -1,0 +1,110 @@
+[
+  {
+    "path": "English/books-english.html",
+    "language": "en",
+    "kind": "books",
+    "title": "Books - Holy Army Fellowship"
+  },
+  {
+    "path": "English/chosen-english.html",
+    "language": "en",
+    "kind": "chosen",
+    "title": "Chosen by God - Holy Army Fellowship"
+  },
+  {
+    "path": "English/faith-english.html",
+    "language": "en",
+    "kind": "faith",
+    "title": "Statement of Faith - Holy Army Fellowship"
+  },
+  {
+    "path": "English/gallery-english.html",
+    "language": "en",
+    "kind": "gallery",
+    "title": "Gallery - Holy Army Fellowship"
+  },
+  {
+    "path": "English/home-english.html",
+    "language": "en",
+    "kind": "home",
+    "title": "Holy Army Fellowship - Welcome"
+  },
+  {
+    "path": "English/origin-english.html",
+    "language": "en",
+    "kind": "origin",
+    "title": "Origin of Work - Holy Army Fellowship"
+  },
+  {
+    "path": "English/prayer-request-english.html",
+    "language": "en",
+    "kind": "prayer-request",
+    "title": "Prayer Request - Holy Army Fellowship"
+  },
+  {
+    "path": "English/testimonies-english.html",
+    "language": "en",
+    "kind": "testimonies",
+    "title": "Testimonies - Holy Army Fellowship"
+  },
+  {
+    "path": "English/videos-english.html",
+    "language": "en",
+    "kind": "videos",
+    "title": "Videos - Holy Army Fellowship"
+  },
+  {
+    "path": "Telugu/books-telugu.html",
+    "language": "te",
+    "kind": "books",
+    "title": "పుస్తకాలు - పరిశుద్ధ సైనిక సహవాసం"
+  },
+  {
+    "path": "Telugu/chosen-telugu.html",
+    "language": "te",
+    "kind": "chosen",
+    "title": "పరిశుద్ధ సైనిక సహవాసం"
+  },
+  {
+    "path": "Telugu/faith-telugu.html",
+    "language": "te",
+    "kind": "faith",
+    "title": "విశ్వాస ప్రకటన - పరిశుద్ధ సైనిక సహవాసం"
+  },
+  {
+    "path": "Telugu/gallery-telugu.html",
+    "language": "te",
+    "kind": "gallery",
+    "title": "గ్యాలరీ - పరిశుద్ధ సైనిక సహవాసం"
+  },
+  {
+    "path": "Telugu/home-telugu.html",
+    "language": "te",
+    "kind": "home",
+    "title": "పరిశుద్ధ సైనిక సహవాసం - స్వాగతం"
+  },
+  {
+    "path": "Telugu/origin-telugu.html",
+    "language": "te",
+    "kind": "origin",
+    "title": "సహవాసం యొక్క మూలం - పరిశుద్ధ సైనిక సహవాసం"
+  },
+  {
+    "path": "Telugu/prayer-request-telugu.html",
+    "language": "te",
+    "kind": "prayer-request",
+    "title": "ప్రార్థన అభ్యర్థన - పరిశుద్ధ సైనిక సహవాసం"
+  },
+  {
+    "path": "Telugu/testimonies-telugu.html",
+    "language": "te",
+    "kind": "testimonies",
+    "title": "సాక్ష్యాలు - పరిశుద్ధ సైనిక సహవాసం"
+  },
+  {
+    "path": "Telugu/videos-telugu.html",
+    "language": "te",
+    "kind": "videos",
+    "title": "వీడియోస్ - పరిశుద్ధ సైనిక సహవాసం"
+  }
+]

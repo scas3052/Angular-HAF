@@ -1,0 +1,74 @@
+<haf-site-header />
+
+    
+  
+    <haf-prayer-toast />
+
+    <div class="container">
+        <aside class="verses-sidebar">
+            <div class="verse">
+                <div class="verse-number">Matthew 10:1</div>
+                <p class="verse-text">Jesus called his twelve disciples to him and gave them authority to drive out impure spirits and to heal every disease and sickness.</p>
+            </div>
+            
+            <div class="verse">
+                <div class="verse-number">Matthew 10:2</div>
+                <p class="verse-text">These are the names of the twelve apostles: first, Simon (who is called Peter) and his brother Andrew; James son of Zebedee, and his brother John;</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">Matthew 10:3</div>
+                <p class="verse-text">Philip and Bartholomew; Thomas and Matthew the tax collector; James son of Alphaeus, and Thaddaeus;</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">Matthew 10:4</div>
+                <p class="verse-text">Simon the Zealot and Judas Iscariot, who betrayed him.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">Matthew 10:5</div>
+                <p class="verse-text">These twelve Jesus sent out with the following instructions: "Do not go among the Gentiles or enter any town of the Samaritans.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">Matthew 10:6</div>
+                <p class="verse-text">Go rather to the lost sheep of Israel.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">Matthew 10:7</div>
+                <p class="verse-text">As you go, proclaim this message: 'The kingdom of heaven has come near.'</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">Matthew 10:8</div>
+                <p class="verse-text">Heal the sick, raise the dead, cleanse those who have leprosy, drive out demons. Freely you have received; freely give.</p>
+            </div>
+
+            <div class="verse">
+                <div class="verse-number">Matthew 10:9</div>
+                <p class="verse-text">Do not get any gold or silver or copper to take with you in your belts.</p>
+            </div>
+        </aside>
+
+        <main id="main-content" tabindex="-1" class="form-container">
+            <h1>Prayer Request</h1>
+            <p class="subtitle">"Ask and it will be given to you; seek and you will find; knock and the door will be opened to you."</p>
+            
+            <div class="request-method-buttons">
+                <button class="method-btn active" (click)="prayer.method.set('whatsapp')" [class.active]="prayer.method() === 'whatsapp'">
+                    <i class="fab fa-whatsapp"></i>
+                    Send via WhatsApp
+                </button>
+                <button class="method-btn" (click)="prayer.method.set('email')" [class.active]="prayer.method() === 'email'">
+                    <i class="fas fa-envelope"></i>
+                    Send via Email
+                </button>
+            </div>
+
+            <haf-prayer-form [copy]="copy" />
+        </main>
+    </div>
+
+    <haf-site-footer />

@@ -1,0 +1,54 @@
+<haf-site-header />
+
+    
+
+    <main id="main-content" tabindex="-1" class="gallery-main">
+      <section class="gallery-hero">
+        <div class="gallery-hero-content">
+          <h1>చిత్రాలలో మా ప్రయాణం</h1>
+          
+        </div>
+      </section>
+
+      <section class="gallery-filter">
+        <div class="filter-container">
+          
+          <button class="filter-btn active" data-filter="all" (click)="filter.set('all')" [class.active]="filter() === 'all'">
+            <i class="fas fa-th"></i> అన్ని ఫోటోలు
+          </button>
+          <button class="filter-btn" data-filter="foundation" (click)="filter.set('foundation')" [class.active]="filter() === 'foundation'">
+            <i class="fas fa-hammer"></i> విశ్వాస పునాది
+          </button>
+        </div>
+      </section>
+
+      <section class="gallery-content">
+        <div class="gallery-grid" id="galleryGrid">@for (image of filteredImages(); track image.src; let index = $index) {
+      <div class="gallery-item" [attr.data-category]="image.category" [attr.data-index]="index"
+        role="button" tabindex="0" (click)="open(index)" (keydown.enter)="open(index)" (keydown.space)="$event.preventDefault(); open(index)">
+        <div class="gallery-item-image"><img [src]="image.src" alt="చర్చి నిర్మాణ పురోగతి, ఫోటో {{ index + 1 }}"
+          [attr.loading]="index < 4 ? 'eager' : 'lazy'" decoding="async" width="400" height="300"></div>
+      </div>
+    }</div>
+      </section>
+    </main>
+
+    
+    <div id="lightbox" class="lightbox" [class.active]="selectedIndex() !== null" (click)="closeOnBackdrop($event)" role="dialog" aria-modal="true" [attr.aria-hidden]="selectedIndex() === null" aria-label="గ్యాలరీ పూర్తి చిత్రం">
+      <div class="lightbox-content">
+        <button class="close-lightbox" aria-label="లైట్‌బాక్స్ మూసివేయి" (click)="close()">
+          <i class="fas fa-times"></i>
+        </button>
+        <button class="lightbox-prev" aria-label="ముందరి చిత్రం" (click)="navigate(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-next" aria-label="తరువాతి చిత్రం" (click)="navigate(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="lightbox-image-container">
+          <img id="lightbox-img" alt="గ్యాలరీ పూర్తి చిత్రం" [attr.src]="selectedImage()?.src ?? null">
+        </div>
+      </div>
+    </div>
+
+    <haf-site-footer />

@@ -1,0 +1,32 @@
+<haf-site-header />
+
+    
+    
+    <main id="main-content" tabindex="-1" class="testimonies-main">
+      <section class="testimonies-hero">
+        <div class="testimonies-hero-content">
+          <h1>సాక్ష్యాలు</h1>
+          <p>విశ్వాసం ద్వారా స్వస్థతను పొందిన సేవకుల సాక్ష్యాలు</p>
+        </div>
+      </section>
+
+      <div class="search-container">
+        <input type="text" class="search-bar" placeholder="పేరుతో వెతకండి..." (input)="search.set($any($event.target).value)">
+      </div>
+
+      <div class="testimonies-controls">
+        <button class="control-btn" id="shuffleTestimonies" (click)="shuffle()"><i class="fas fa-random"></i> Shuffle</button>
+      </div>
+
+      <div class="no-results" [style.display]="hasResults() ? 'none' : 'block'">
+        <p>మీరు వెతికిన పేరుతో సాక్ష్యం లభించలేదు.</p>
+        <p>దయచేసి మరొక పేరు ప్రయత్నించండి.</p>
+      </div>
+      
+
+      <section class="testimonies-grid">@for (story of stories(); track story.id) {
+      <div class="testimony-card" hafTestimonyCard [story]="story" [class.hidden]="!matches(story)"></div>
+    }</section>
+    </main>
+
+    <haf-site-footer />

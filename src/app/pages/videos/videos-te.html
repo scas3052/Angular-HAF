@@ -1,0 +1,94 @@
+<haf-site-header />
+
+    
+
+    <main id="main-content" tabindex="-1" class="videos-main">
+      <section class="videos-hero">
+        <div class="videos-hero-content">
+          <h1>మా వీడియోలు</h1>
+          <p>
+            పాటలు మరియు పవిత్ర సందేశాల ద్వారా ఆరాధనతో కూడిన అనుభూతిని పొందండి.  
+          </p>
+        </div>
+        </section>
+
+      <div class="videos-container" hafVideoCatalog="">
+        
+        <section class="video-section songs-section" hafVideoSection="" #videoSection0="hafVideoSection" [section]="sections[0]">
+          <div class="section-header" hafVideoSectionToggle="">
+            <h2>
+              <i class="fas fa-music"></i>
+              పాటలు
+            </h2>
+            <span class="video-count">42 వీడియోలు</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          
+          <div class="section-content">
+            <div class="search-box">
+              <input type="text" id="songSearch" placeholder="Search songs by name..." hafVideoSearch="">
+              <i class="fas fa-search"></i>
+            </div><div class="video-controls" style="display:flex; gap:10px; margin: 15px 0;">
+      <button class="control-btn" id="shuffleVideos" (click)="videoSection0.shuffle()"><i class="fas fa-random"></i> Shuffle</button>
+    </div>
+            
+            <div class="video-grid">@for (card of videoSection0.cards(); track card.key) {
+      <div class="video-card" hafVideoCard [card]="card" [attr.data-category]="card.category"
+        [style.display]="videoSection0.matches(card) ? (videoSection0.filtered() ? 'block' : null) : 'none'"></div>
+    }</div>
+          </div>
+        </section>
+
+        
+        <section class="video-section messages-section" hafVideoSection="" #videoSection1="hafVideoSection" [section]="sections[1]">
+          <div class="section-header" hafVideoSectionToggle="">
+            <h2>
+              <i class="fas fa-microphone-alt"></i>
+              వాక్య సందేశాలు
+            </h2>
+            <span class="video-count">391 వీడియోలు</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          
+          <div class="section-content">
+            <div class="search-box">
+              <input type="text" id="messageSearch" placeholder="శీర్షిక ద్వారా సందేశాలను శోధించండి..." hafVideoSearch="">
+              <i class="fas fa-search"></i>
+            </div><div class="video-controls" style="display:flex; gap:10px; margin: 15px 0;">
+      <button class="control-btn" id="shuffleVideos" (click)="videoSection1.shuffle()"><i class="fas fa-random"></i> Shuffle</button>
+    </div>
+            
+            <div class="video-categories">
+              <button class="category-btn active" data-category="all-messages" hafVideoCategory="all-messages">
+                అన్ని సందేశాలు
+              </button>
+              <button class="category-btn" data-category="abraham" hafVideoCategory="abraham">
+                బ్రదర్ ఎం. అబ్రహాం
+              </button>
+              <button class="category-btn" data-category="rani" hafVideoCategory="rani">
+                శ్రీమతి ఎం. రాణి అబ్రహాం
+              </button>
+              <button class="category-btn" data-category="special" hafVideoCategory="special">
+                రెండవ శనివారం సేవ
+              </button>
+              <button class="category-btn" data-category="sunday" hafVideoCategory="sunday">
+                ఆదివారం సేవ
+              </button>
+              <button class="category-btn" data-category="retreats" hafVideoCategory="retreats">
+                రిట్రీట్లు
+              </button>
+              <button class="category-btn" data-category="Shorts" hafVideoCategory="Shorts">
+                ఇతర సందేశాలు
+              </button>
+            </div>
+            
+            <div class="video-grid">@for (card of videoSection1.cards(); track card.key) {
+      <div class="video-card" hafVideoCard [card]="card" [attr.data-category]="card.category"
+        [style.display]="videoSection1.matches(card) ? (videoSection1.filtered() ? 'block' : null) : 'none'"></div>
+    }</div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <haf-site-footer />

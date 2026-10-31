@@ -1,0 +1,100 @@
+<haf-site-header />
+
+      
+
+    <main id="main-content" tabindex="-1" class="videos-main">
+      <section class="videos-hero">
+        <div class="videos-hero-content">
+          <h1>Our Videos</h1>
+          <p>
+            Experience worship and teachings through our collection of songs and
+            messages
+          </p>
+        </div>
+      </section>
+
+      <div class="videos-container" hafVideoCatalog="">
+        
+        <section class="video-section songs-section" hafVideoSection="" #videoSection0="hafVideoSection" [section]="sections[0]">
+          <div class="section-header" hafVideoSectionToggle="">
+            <h2>
+              <i class="fas fa-music"></i>
+              Worship Songs
+            </h2>
+            <span class="video-count">42 Videos</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          
+          <div class="section-content">
+            <div class="search-box">
+              <input type="text" id="songSearch" placeholder="Search songs by name..." hafVideoSearch="">
+              <i class="fas fa-search"></i>
+            </div><div class="video-controls" style="display:flex; gap:10px; margin: 15px 0;">
+      <button class="control-btn" id="shuffleVideos" (click)="videoSection0.shuffle()"><i class="fas fa-random"></i> Shuffle</button>
+    </div>
+            
+            <div class="video-grid">@for (card of videoSection0.cards(); track card.key) {
+      <div class="video-card" hafVideoCard [card]="card" [attr.data-category]="card.category"
+        [style.display]="videoSection0.matches(card) ? (videoSection0.filtered() ? 'block' : null) : 'none'"></div>
+    }</div>
+          </div>
+        </section>
+
+        
+        <section class="video-section messages-section" hafVideoSection="" #videoSection1="hafVideoSection" [section]="sections[1]">
+          <div class="section-header" hafVideoSectionToggle="">
+            <h2>
+              <i class="fas fa-microphone-alt"></i>
+              Messages
+            </h2>
+            <span class="video-count">391 Videos</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          
+          <div class="section-content">
+            <div class="search-box">
+              <input type="text" id="messageSearch" placeholder="Search messages by title..." hafVideoSearch="">
+              <i class="fas fa-search"></i>
+            </div><div class="video-controls" style="display:flex; gap:10px; margin: 15px 0;">
+      <button class="control-btn" id="shuffleVideos" (click)="videoSection1.shuffle()"><i class="fas fa-random"></i> Shuffle</button>
+    </div>
+            
+            <div class="video-categories">
+              <button class="category-btn active" data-category="all-messages" hafVideoCategory="all-messages">
+                All Messages
+              </button>
+              <button class="category-btn" data-category="abraham" hafVideoCategory="abraham">
+                Bro. M. Abraham
+              </button>
+              <button class="category-btn" data-category="rani" hafVideoCategory="rani">
+                Smt. M. Rani Abraham
+              </button>
+              <button class="category-btn" data-category="special" hafVideoCategory="special">
+                Second Saturday Service
+              </button>
+              <button class="category-btn" data-category="sunday" hafVideoCategory="sunday">
+                Sunday Service
+              </button>
+              <button class="category-btn" data-category="retreats" hafVideoCategory="retreats">
+                Retreats
+              </button>
+              <button class="category-btn" data-category="ai" hafVideoCategory="ai">
+                AI Animated Series
+              </button>
+              <button class="category-btn" data-category="testimonies" hafVideoCategory="testimonies">
+                Testimonies
+              </button>
+              <button class="category-btn" data-category="Shorts" hafVideoCategory="Shorts">
+                Other Messages
+            </button></div>
+            
+            <div class="video-grid">@for (card of videoSection1.cards(); track card.key) {
+      <div class="video-card" hafVideoCard [card]="card" [attr.data-category]="card.category"
+        [style.display]="videoSection1.matches(card) ? (videoSection1.filtered() ? 'block' : null) : 'none'"></div>
+    }</div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <haf-site-footer />

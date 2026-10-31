@@ -1,0 +1,223 @@
+@switch (context.layout().header) {
+@case ('1b608c8a46') {
+<header [class.transparent]="transparent()">
+      <div class="site-title" [class.transparent]="transparent()">
+        <a class="site-logo" routerLink="/english/home">
+          <div class="logo-image">
+            <img src="/src/images/bg/Logo%20Png.png" alt="Holy Army Fellowship Logo">
+          </div>
+          <div class="site-name">Holy Army Fellowship</div>
+        </a>
+      </div>
+        <button class="menu-toggle" aria-label="Toggle navigation" (click)="toggleMenu()" [class.active]="menuOpen()" [attr.aria-expanded]="menuOpen()">
+          <i class="fas fa-bars"></i>
+        </button>
+    </header>
+}
+@case ('1892cc465a') {
+<header [class.transparent]="transparent()">
+      <div class="site-title" [class.transparent]="transparent()">
+        <a class="site-logo" routerLink="/english/home">
+          <div class="logo-image">
+            <img src="/src/images/bg/Logo%20Png.png" alt="Holy Army Fellowship Logo">
+          </div>
+          <div class="site-name">Holy Army Fellowship</div>
+        </a>
+      </div>
+      <div class="header-controls">
+        <a class="language-select" title="Change Language" routerLink="/language">
+          <i class="fas fa-language"></i>
+        </a>
+        <button class="menu-toggle" aria-label="Toggle navigation" (click)="toggleMenu()" [class.active]="menuOpen()" [attr.aria-expanded]="menuOpen()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+}
+@case ('08a06d5bea') {
+<header [class.transparent]="transparent()">
+      <div class="site-title" [class.transparent]="transparent()">
+        <a class="site-logo" routerLink="/english/home">
+          <div class="logo-image">
+            <img src="/src/images/bg/Logo%20Png.png" alt="Holy Army Fellowship Logo">
+          </div>
+          <div class="site-name">Holy Army Fellowship</div>
+        </a>
+      </div>
+      <div class="header-controls">
+        
+        <button class="menu-toggle" aria-label="Toggle navigation" (click)="toggleMenu()" [class.active]="menuOpen()" [attr.aria-expanded]="menuOpen()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+}
+@case ('f9145c5fb8') {
+<header [class.transparent]="transparent()">
+      <div class="site-title" [class.transparent]="transparent()">
+        <a class="site-logo" routerLink="/telugu/home">
+          <div class="logo-image">
+            <img src="/src/images/bg/Logo%20Png.png" alt="పరిశుద్ధ సైనిక సహవాసం లోగో">
+          </div>
+          <div class="site-name">పరిశుద్ధ సైనిక సహవాసం</div>
+        </a>
+      </div>
+      <button class="menu-toggle" aria-label="నావిగేషన్ టోగుల్" (click)="toggleMenu()" [class.active]="menuOpen()" [attr.aria-expanded]="menuOpen()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </header>
+}
+@case ('9768122167') {
+<header [class.transparent]="transparent()">
+      <div class="site-title" [class.transparent]="transparent()">
+        <a class="site-logo" routerLink="/telugu/home">
+          <div class="logo-image">
+            <img src="/src/images/bg/Logo%20Png.png" alt="పరిశుద్ధ సైనిక సహవాసం లోగో">
+          </div>
+          <div class="site-name">పరిశుద్ధ సైనిక సహవాసం</div>
+        </a>
+      </div>
+      <button class="menu-toggle" aria-label="Toggle navigation" (click)="toggleMenu()" [class.active]="menuOpen()" [attr.aria-expanded]="menuOpen()">
+        <i class="fas fa-bars"></i>
+      </button>
+    </header>
+}
+@case ('711bd5b1eb') {
+<header [class.transparent]="transparent()">
+      <div class="site-title" [class.transparent]="transparent()">
+        <a class="site-logo" routerLink="/telugu/home">
+          <div class="logo-image">
+            <img src="/src/images/bg/Logo%20Png.png" alt="పరిశుద్ధ సైనిక సహవాసం లోగో">
+          </div>
+          <div class="site-name">పరిశుద్ధ సైనిక సహవాసం</div>
+        </a>
+      </div>
+      <div class="header-controls">
+        
+        <button class="menu-toggle" aria-label="నావిగేషన్ టోగుల్" (click)="toggleMenu()" [class.active]="menuOpen()" [attr.aria-expanded]="menuOpen()">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </header>
+}
+}
+
+@switch (context.layout().navigation) {
+@case ('65e21e5429') {
+<nav class="main-nav" [class.active]="menuOpen()" [class.nav-transparent]="transparent()" [style.background]="menuOpen() ? navigationBackground() : null" [style.backdrop-filter]="menuOpen() &amp;&amp; transparent() ? 'blur(10px)' : null" [style.-webkit-backdrop-filter]="menuOpen() &amp;&amp; transparent() ? 'blur(10px)' : null">
+      <button class="nav-close" aria-label="Close navigation" (click)="menuOpen.set(false)">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="nav-container">
+        <div class="nav-links">
+          <a class="nav-home" routerLink="/english/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-home"></i>
+            Home
+          </a>
+          <div class="dropdown" [class.active]="dropdownOpen()">
+            <a href="#" class="dropdown-toggle" role="button" (click)="toggleDropdown($event)" (keydown.space)="toggleDropdown($event)" [attr.aria-expanded]="dropdownOpen()">
+              <i class="fas fa-scroll"></i>
+              About Us
+              <i class="fas fa-chevron-down"></i>
+            </a>
+            <div class="dropdown-menu">
+              <a routerLink="/english/chosen" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-hand-holding-heart"></i>
+                Chosen by God
+              </a>
+              <a routerLink="/english/origin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-history"></i>
+                Origin of Work
+              </a>
+              <a routerLink="/english/faith" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-cross"></i>
+                Statement of Faith
+              </a>
+            </div>
+          </div>
+          
+          <a routerLink="/english/gallery" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-images"></i>
+            Gallery
+          </a>
+          <a routerLink="/english/videos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-video"></i>
+            Videos
+          </a>
+          
+          <a routerLink="/english/books" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-book-bible"></i>
+            Books
+          </a>
+          <a routerLink="/english/testimonies" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-dove"></i>
+            Testimonies
+          </a>
+          <a routerLink="/english/prayer-request" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-praying-hands"></i>
+            Prayer Request
+          </a>
+          
+        </div>
+      </div>
+    </nav>
+}
+@case ('e95f5b28b1') {
+<nav class="main-nav" [class.active]="menuOpen()" [class.nav-transparent]="transparent()" [style.background]="menuOpen() ? navigationBackground() : null" [style.backdrop-filter]="menuOpen() &amp;&amp; transparent() ? 'blur(10px)' : null" [style.-webkit-backdrop-filter]="menuOpen() &amp;&amp; transparent() ? 'blur(10px)' : null">
+      <button class="nav-close" aria-label="నావిగేషన్ మూసివేయి" (click)="menuOpen.set(false)">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="nav-container">
+        <div class="nav-links">
+          <a class="nav-home" routerLink="/telugu/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-home"></i>
+            హోమ్
+          </a>
+          <div class="dropdown" [class.active]="dropdownOpen()">
+            <a href="#" class="dropdown-toggle" role="button" (click)="toggleDropdown($event)" (keydown.space)="toggleDropdown($event)" [attr.aria-expanded]="dropdownOpen()">
+              <i class="fas fa-scroll"></i>
+              మా గురించి
+              <i class="fas fa-chevron-down"></i>
+            </a>
+            <div class="dropdown-menu">
+              <a routerLink="/telugu/chosen" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-hand-holding-heart"></i>
+                దేవునిచే ఎంచుకోబడిన
+              </a>
+              <a routerLink="/telugu/origin" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-history"></i>
+                సహవాసం యొక్క మూలం
+              </a>
+              <a routerLink="/telugu/faith" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+                <i class="fas fa-cross"></i>
+                విశ్వాస ప్రకటన
+              </a>
+            </div>
+          </div>
+          
+          <a routerLink="/telugu/gallery" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-images"></i>
+            గ్యాలరీ
+          </a>
+          <a routerLink="/telugu/videos" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-video"></i>
+            వీడియోస్
+          </a>
+          <a routerLink="/telugu/books" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-book-bible"></i>
+            పుస్తకాలు
+          </a>
+          <a routerLink="/telugu/testimonies" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-dove"></i>
+            సాక్ష్యాలు
+          </a>
+          <a routerLink="/telugu/prayer-request" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fas fa-praying-hands"></i>
+            ప్రార్థన అభ్యర్థన
+          </a>
+          
+        </div>
+      </div>
+    </nav>
+}
+}
