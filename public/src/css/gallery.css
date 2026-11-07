@@ -21,13 +21,8 @@
   left: -50%;
   width: 200%;
   height: 200%;
+  /* No rotation animation: spinning a circular gradient looks identical but repaints a huge layer every frame. */
   background: radial-gradient(circle, rgba(255, 193, 7, 0.05) 0%, transparent 70%);
-  animation: rotateBackground 20s linear infinite;
-}
-
-@keyframes rotateBackground {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 .gallery-hero-content {
@@ -62,6 +57,15 @@
   z-index: 90;
   box-shadow: 0 2px 15px rgba(44, 74, 124, 0.08);
   border-bottom: 1px solid rgba(44, 74, 124, 0.1);
+}
+
+/* Blurring what scrolls under a sticky bar is costly on phones; a near-opaque bar looks the same. */
+@media (hover: none) {
+  .gallery-filter {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 
 .filter-container {
@@ -139,9 +143,10 @@
   border-radius: 15px;
   overflow: hidden;
   cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(44, 74, 124, 0.1);
-  background: white;
+  /* Placeholder colour while a photo downloads. */
+  background: #e9edf3;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeInUp 0.6s ease forwards;
@@ -263,8 +268,6 @@
   z-index: 2000;
   justify-content: center;
   align-items: center;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -646,10 +649,6 @@
   .gallery-item-description {
     animation: none !important;
     transition: none !important;
-  }
-
-  .gallery-hero::before {
-    animation: none;
   }
 }
 

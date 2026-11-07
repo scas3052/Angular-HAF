@@ -148,8 +148,10 @@ for (const entry of pages) {
       }
     }
     await Promise.all([hideFooter(page), hideFooter(original)]);
-    const actualBytes = await page.screenshot({ path: testInfo.outputPath('angular.png'), fullPage: true, animations: 'disabled', mask: [page.locator('iframe')] });
-    const originalBytes = await original.screenshot({ path: testInfo.outputPath('original.png'), fullPage: true, animations: 'disabled', mask: [original.locator('iframe')] });
+    // Gallery photos are now pre-resized WebP copies, so only their position and size are compared.
+    const masked = (target: Page) => [target.locator('iframe'), ...(entry.kind === 'gallery' ? [target.locator('.gallery-item img')] : [])];
+    const actualBytes = await page.screenshot({ path: testInfo.outputPath('angular.png'), fullPage: true, animations: 'disabled', mask: masked(page) });
+    const originalBytes = await original.screenshot({ path: testInfo.outputPath('original.png'), fullPage: true, animations: 'disabled', mask: masked(original) });
     const actual = PNG.sync.read(actualBytes);
     const expected = PNG.sync.read(originalBytes);
     expect({ width: actual.width, height: actual.height }).toEqual({ width: expected.width, height: expected.height });
@@ -260,6 +262,52 @@ test('gallery filtering, navigation, and close restore scroll', async ({ page })
   await page.keyboard.press('Escape');
   await expect(page.locator('#lightbox')).not.toHaveClass(/active/);
   await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');
+});
+
+for (const path of ['/english/gallery', '/telugu/gallery']) {
+  test(`${path} loads small WebP thumbnails at their real shape and a sharp lightbox photo`, async ({ page, request }) => {
+    await page.goto(path, { waitUntil: 'domcontentloaded' });
+    const images = page.locator('.gallery-item img');
+    await expect(images).toHaveCount(24);
+    const thumbs = await images.evaluateAll(list => (list as HTMLImageElement[]).map(img => ({
+      src: img.getAttribute('src')!, srcset: img.getAttribute('srcset')!, sizes: img.getAttribute('sizes'),
+      width: img.getAttribute('width'), height: img.getAttribute('height'),
+    })));
+    for (const thumb of thumbs) {
+      expect(thumb.src).toMatch(/^\/src\/images\/Gallery\/w480\/.+\.webp$/);
+      expect(thumb.srcset).toContain('/w960/');
+      expect(thumb.sizes).toBeTruthy();
+      expect(Number(thumb.width)).toBeGreaterThan(0);
+      expect(Number(thumb.height)).toBeGreaterThan(0);
+    }
+    expect(new Set(thumbs.map(thumb => `${thumb.width}x${thumb.height}`)).size).toBeGreaterThan(1);
+
+    const first = images.first();
+    await expect.poll(() => first.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth)).toBeGreaterThan(0);
+    const box = await first.boundingBox();
+    expect(Math.abs(box!.width / box!.height - Number(thumbs[0].width) / Number(thumbs[0].height))).toBeLessThan(0.02);
+
+    for (const url of new Set(thumbs.flatMap(thumb => thumb.srcset.split(',').map(part => part.trim().split(' ')[0])))) {
+      const response = await request.get(url);
+      expect(response.status(), url).toBe(200);
+      expect(response.headers()['content-type'], url).toContain('image/webp');
+      expect((await response.body()).length, url).toBeLessThan(150_000);
+    }
+
+    await images.first().click();
+    const lightbox = page.locator('#lightbox-img');
+    await expect(lightbox).toHaveAttribute('src', /^\/src\/images\/Gallery\/w1920\/.+\.webp$/);
+    await expect(lightbox).toHaveAttribute('srcset', /\/w960\/.+ 960w, .+\/w1920\/.+ 1920w/);
+  });
+}
+
+test('gallery has no permanent animation or scroll-time blur on touch devices', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ baseURL, hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  await page.goto('/english/gallery', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.gallery-filter')).toHaveCSS('backdrop-filter', 'none');
+  expect(await page.locator('.gallery-hero').evaluate(element => getComputedStyle(element, '::before').animationName)).toBe('none');
+  await context.close();
 });
 
 test('book reader keeps all chapters and selection in sync', async ({ page }) => {

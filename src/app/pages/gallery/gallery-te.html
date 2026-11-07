@@ -26,8 +26,8 @@
         <div class="gallery-grid" id="galleryGrid">@for (image of filteredImages(); track image.src; let index = $index) {
       <div class="gallery-item" [attr.data-category]="image.category" [attr.data-index]="index"
         role="button" tabindex="0" (click)="open(index)" (keydown.enter)="open(index)" (keydown.space)="$event.preventDefault(); open(index)">
-        <div class="gallery-item-image"><img [src]="image.src" alt="చర్చి నిర్మాణ పురోగతి, ఫోటో {{ index + 1 }}"
-          [attr.loading]="index < 4 ? 'eager' : 'lazy'" decoding="async" width="400" height="300"></div>
+        <div class="gallery-item-image"><img alt="చర్చి నిర్మాణ పురోగతి, ఫోటో {{ index + 1 }}" decoding="async" [width]="image.width" [height]="image.height" [style.aspect-ratio]="image.width + ' / ' + image.height"
+          [attr.loading]="index < 4 ? 'eager' : 'lazy'" [attr.sizes]="gallerySizes" [attr.srcset]="image.thumbSrcset" [src]="image.thumb"></div>
       </div>
     }</div>
       </section>
@@ -46,7 +46,7 @@
           <i class="fas fa-chevron-right"></i>
         </button>
         <div class="lightbox-image-container">
-          <img id="lightbox-img" alt="గ్యాలరీ పూర్తి చిత్రం" [attr.src]="selectedImage()?.src ?? null">
+          <img id="lightbox-img" alt="గ్యాలరీ పూర్తి చిత్రం" [attr.sizes]="lightboxSizes" [attr.srcset]="selectedImage()?.largeSrcset ?? null" [attr.src]="selectedImage()?.large ?? null">
         </div>
       </div>
     </div>
