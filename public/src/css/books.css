@@ -1,318 +1,823 @@
-/* Books Page Styles */
-.books-main {
-  padding-top: 8rem;
-  min-height: calc(100vh - 300px);
-}
+/* ==========================================================================
+   Books - "Midnight & Gold"
+   A lit library shelf of book cards and the full-screen chapter reader
+   (<haf-book-reader>). The hero is styled by the shared style.css.
+   ========================================================================== */
 
-.books-hero {
-  background: linear-gradient(to right, rgba(44, 74, 124, 0.05), rgba(44, 74, 124, 0.1));
-  padding: 3rem 2rem;
-  text-align: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.books-hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.books-hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  font-family: 'Cinzel', serif;
-  color: var(--primary-color);
-}
-
-.books-hero p {
-  font-size: 1.2rem;
-  color: #4a5568;
-}
+/* ---------- Library shelf ---------- */
 
 .books-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1200px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  max-width: 1240px;
   margin: 0 auto;
+  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 4vw, 2rem) clamp(4rem, 8vw, 6rem);
+  background:
+    radial-gradient(38rem 20rem at 50% 0%, rgba(245, 196, 81, 0.12), transparent 70%),
+    radial-gradient(30rem 18rem at 50% 100%, rgba(75, 47, 122, 0.06), transparent 70%);
 }
 
+/* ---------- Book card ---------- */
+
+/* Revealed on scroll by the motion service, so the card itself carries no CSS animation. */
 .book-card {
-  background: white;
-  border-radius: 12px;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1 1 300px;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 370px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s var(--ease-out), box-shadow 0.5s var(--ease-out), border-color 0.4s;
 }
 
-.book-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+/* Shimmering gold edge drawn across the top of the active card. */
+.book-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  height: 3px;
+  background: var(--gold-grad);
+  background-size: 200% auto;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-out);
+  pointer-events: none;
 }
+
+/* Spotlight that follows the pointer (--mx / --my come from the motion service). */
+.book-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 0%), rgba(245, 196, 81, 0.16), transparent 45%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+
+.book-card:focus-within {
+  border-color: rgba(228, 176, 74, 0.55);
+}
+
+.book-card:focus-within::before {
+  transform: scaleX(1);
+  animation: haf-shimmer 4s linear infinite;
+}
+
+/* ---------- Cover stage ---------- */
 
 .book-cover {
   position: relative;
-  padding-top: 140%;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
   overflow: hidden;
+  padding: clamp(1.75rem, 4vw, 2.5rem) 1.5rem clamp(1.75rem, 3.5vw, 2.25rem);
+  background:
+    radial-gradient(1.2px 1.2px at 22px 30px, rgba(255, 255, 255, 0.85), transparent) 0 0 / 140px 140px,
+    radial-gradient(1px 1px at 96px 84px, rgba(255, 236, 190, 0.75), transparent) 0 0 / 180px 180px,
+    radial-gradient(1.5px 1.5px at 48px 150px, rgba(255, 255, 255, 0.55), transparent) 0 0 / 230px 230px,
+    radial-gradient(60% 28% at 50% 100%, rgba(245, 196, 81, 0.2), transparent 75%),
+    var(--ink-grad);
+  perspective: 1200px;
+}
+
+/* A soft halo breathing behind the book. */
+.book-cover::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -1;
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 196, 81, 0.4), rgba(245, 196, 81, 0.1) 42%, transparent 68%);
+  transform: translate(-50%, -50%);
+  animation: haf-glow 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.book-card:nth-child(2) .book-cover::before {
+  animation-delay: -2s;
+}
+
+.book-card:nth-child(3) .book-cover::before {
+  animation-delay: -4s;
+}
+
+/* Glossy light that sweeps across the cover on hover. */
+.book-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+  transform: translateX(-130%) skewX(-20deg);
+  pointer-events: none;
 }
 
 .book-cover img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(64%, 210px);
+  height: auto;
+  aspect-ratio: 2 / 3;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  border-radius: 3px 8px 8px 3px;
+  background: var(--ink-3);
+  box-shadow:
+    4px 4px 0 -1px #f4ecd8,
+    8px 8px 0 -2px #e6d7b5,
+    0 26px 40px -14px rgba(0, 0, 0, 0.75);
+  transform-origin: left center;
+  transition: transform 0.7s var(--ease-out), box-shadow 0.7s var(--ease-out);
 }
 
+/* ---------- Book details ---------- */
+
 .book-info {
-  padding: 1.5rem;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: clamp(1.35rem, 3vw, 1.85rem);
 }
 
 .book-info h3 {
-  font-family: 'Cinzel', serif;
-  color: var(--primary-color);
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  position: relative;
+  padding-bottom: 0.8rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.08rem, 0.35vw + 1rem, 1.22rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--ink);
+  text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
-.author {
-  color: #666;
+.book-info h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 3rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold-2), rgba(245, 196, 81, 0));
+  transition: width 0.6s var(--ease-out);
+  pointer-events: none;
+}
+
+.book-card:focus-within .book-info h3::after {
+  width: 100%;
+}
+
+.book-info .author {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--muted);
+  font-size: 0.98rem;
   font-style: italic;
-  margin-bottom: 1rem;
 }
 
-.description {
-  color: #4a5568;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
+.book-info .author::before {
+  content: '\f52d';
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free';
+  font-size: 0.85rem;
+  font-style: normal;
+  font-weight: 900;
+  color: var(--gold-deep);
+}
+
+.book-info .description {
+  padding: 0.8rem 1rem 0.8rem 1.15rem;
+  border-left: 3px solid var(--gold-2);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: linear-gradient(90deg, rgba(245, 196, 81, 0.16), rgba(245, 196, 81, 0.03));
+  color: var(--text);
+  font-size: 0.97rem;
+  line-height: 1.75;
+}
+
+.book-info .description:empty {
+  display: none;
 }
 
 .book-meta {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  color: #666;
-}
-
-.book-meta span {
-  display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
-.book-meta i {
-  color: var(--primary-color);
+.book-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid rgba(228, 176, 74, 0.45);
+  border-radius: 999px;
+  background: var(--gold-soft);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.5;
+  animation: haf-pop 0.6s var(--ease-spring) 0.45s backwards;
 }
 
+.book-card:nth-child(2) .book-meta span {
+  animation-delay: 0.6s;
+}
+
+.book-card:nth-child(3) .book-meta span {
+  animation-delay: 0.75s;
+}
+
+.book-meta i {
+  display: inline-block;
+  color: var(--gold-deep);
+  transition: rotate 0.5s var(--ease-spring);
+}
+
+/* ---------- Actions ---------- */
+
 .book-actions {
-  display: flex;
-  gap: 1rem;
-  flex-direction: column;
+  display: grid;
+  gap: 0.7rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
 }
 
 .read-btn,
 .download-btn {
-  display: flex;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  gap: 0.6rem;
   width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1.4rem;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.35s var(--ease-spring), scale 0.2s var(--ease-out), box-shadow 0.35s var(--ease-out), color 0.35s, border-color 0.35s;
+}
+
+.read-btn i,
+.download-btn i {
+  display: inline-block;
+  transition: color 0.35s, rotate 0.4s var(--ease-spring), scale 0.4s var(--ease-spring);
 }
 
 .read-btn {
-  background: var(--primary-color);
-  color: white;
-  border: none;
+  background: var(--gold-fill);
+  color: var(--ink);
+  box-shadow: var(--shadow-gold);
 }
 
-.read-btn:hover {
-  background: var(--secondary-color);
-  transform: translateY(-2px);
+.read-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: translateX(-130%) skewX(-20deg);
+  pointer-events: none;
 }
 
 .download-btn {
-  background: var(--secondary-color);
-  color: var(--primary-color);
+  border-color: var(--gold-2);
+  background: transparent;
+  color: var(--ink);
 }
 
-.download-btn:hover {
-  background: var(--primary-color);
-  color: white;
-  transform: translateY(-2px);
+/* Night-ink fill that wipes through the outlined button. */
+.download-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, var(--ink-3), var(--ink));
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease-out);
+  pointer-events: none;
 }
 
-/* Book Reader Modal Styles */
+.download-btn i {
+  color: var(--gold-deep);
+}
+
+.read-btn:active,
+.download-btn:active {
+  scale: 0.97;
+}
+
+.read-btn:focus-visible,
+.download-btn:focus-visible {
+  outline-color: var(--gold-deep);
+}
+
+@keyframes books-drop {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+
+  35% {
+    translate: 0 5px;
+  }
+
+  65% {
+    translate: 0 -2px;
+  }
+}
+
+/* ---------- Hover (colour and light) ---------- */
+
+@media (hover: hover) {
+  .book-card:hover::before {
+    transform: scaleX(1);
+    animation: haf-shimmer 4s linear infinite;
+  }
+
+  .book-card:hover .book-cover::after {
+    animation: haf-sweep 1.2s var(--ease-out);
+  }
+
+  .book-card:hover .book-info h3::after {
+    width: 100%;
+  }
+
+  .book-card:hover .book-meta i {
+    rotate: -12deg;
+  }
+
+  .read-btn:hover {
+    box-shadow: 0 18px 38px -14px rgba(245, 196, 81, 0.8);
+  }
+
+  .read-btn:hover::after {
+    animation: haf-sweep 0.9s var(--ease-out);
+  }
+
+  .download-btn:hover {
+    border-color: var(--ink);
+    color: var(--gold-soft);
+    box-shadow: 0 16px 32px -16px rgba(11, 16, 38, 0.55);
+  }
+
+  .download-btn:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .download-btn:hover i {
+    color: var(--gold);
+    animation: books-drop 0.7s var(--ease-spring);
+  }
+}
+
+/* ---------- Hover (movement, fine pointers only) ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .book-card:hover {
+    transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-8px);
+    border-color: rgba(228, 176, 74, 0.55);
+    box-shadow: var(--shadow), 0 0 40px -12px rgba(245, 196, 81, 0.5);
+  }
+
+  .book-card:hover::after {
+    opacity: 1;
+  }
+
+  /* The cover swings open on its spine. */
+  .book-card:hover .book-cover img {
+    transform: rotateY(-16deg) translateY(-6px) scale(1.03);
+    box-shadow:
+      6px 5px 0 -1px #f4ecd8,
+      12px 10px 0 -2px #e6d7b5,
+      0 36px 48px -16px rgba(0, 0, 0, 0.8);
+  }
+
+  .read-btn:hover,
+  .download-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .read-btn:hover i {
+    rotate: -8deg;
+    scale: 1.15;
+  }
+}
+
+/* ---------- Chapter reader ---------- */
+
+/* Shown and hidden through the reader's inline display binding; sits above the fixed header. */
 .reader-modal {
-  display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
-  justify-content: center;
+  inset: 0;
+  z-index: 2000;
+  display: none;
   align-items: center;
-  padding: 1rem;
+  justify-content: center;
+  padding: clamp(0.75rem, 3vw, 2rem);
+  background:
+    radial-gradient(70% 60% at 50% 0%, rgba(75, 47, 122, 0.45), transparent 70%),
+    rgba(6, 9, 24, 0.86);
+  animation: haf-fade-in 0.35s var(--ease-out);
 }
 
 .reader-content {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
+  width: min(100%, 900px);
+  height: min(100%, 60rem);
+  overflow: hidden;
+  border: 1px solid rgba(245, 196, 81, 0.45);
+  border-radius: var(--radius);
+  background: var(--cream);
+  box-shadow:
+    0 40px 90px -30px rgba(0, 0, 0, 0.85),
+    0 0 70px -24px rgba(245, 196, 81, 0.4);
+  animation: haf-zoom-in 0.5s var(--ease-spring) backwards;
 }
 
 .reader-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background: var(--primary-color);
-  color: white;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem clamp(1.1rem, 3vw, 1.75rem);
+  border-bottom: 1px solid rgba(245, 196, 81, 0.4);
+  background:
+    radial-gradient(60% 160% at 0% 0%, rgba(245, 196, 81, 0.16), transparent 70%),
+    var(--ink-grad);
+  color: #fff;
 }
 
 .reader-header h2 {
-  font-family: 'Cinzel', serif;
-  margin: 0;
-  font-size: 1.5rem;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 0.8vw + 0.9rem, 1.45rem);
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  color: var(--gold);
+  background: var(--gold-grad);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: haf-shimmer 8s linear infinite;
 }
 
 .close-reader {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid rgba(245, 196, 81, 0.55);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--gold);
+  font-size: 1.1rem;
   cursor: pointer;
-  padding: 0.5rem;
-  transition: transform 0.3s ease;
+  transition: rotate 0.45s var(--ease-spring), scale 0.2s var(--ease-out), background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
-.close-reader:hover {
-  transform: scale(1.1);
+.close-reader:active {
+  scale: 0.92;
 }
 
 .reader-body {
-  padding: 2rem;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  flex-grow: 1;
-  line-height: 1.8;
-  font-size: 1.1rem;
+  overscroll-behavior: contain;
+  padding-block: clamp(1.5rem, 4vw, 2.75rem);
+  padding-inline: max(clamp(1.25rem, 5vw, 3.5rem), calc((100% - 68ch) / 2));
+  background:
+    radial-gradient(80% 40% at 50% 0%, rgba(245, 196, 81, 0.09), transparent 70%),
+    var(--cream);
+  color: var(--text);
+  font-size: clamp(1.02rem, 0.3vw + 0.95rem, 1.15rem);
+  line-height: 1.9;
+  text-wrap: pretty;
+  scrollbar-color: rgba(228, 176, 74, 0.75) transparent;
+  scrollbar-width: thin;
+}
+
+.reader-body:focus-visible {
+  outline-color: var(--gold-deep);
+  outline-offset: -4px;
+}
+
+.reader-body p {
+  margin: 0 0 0.5em;
+}
+
+.reader-body b,
+.reader-body strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.reader-body ::selection {
+  background: rgba(245, 196, 81, 0.35);
+  color: var(--ink);
 }
 
 .reader-navigation {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  background: #f8f9fa;
-  border-top: 1px solid #e2e8f0;
-}
-
-.chapter-select {
-  padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  font-family: 'Cinzel', serif;
-  color: var(--primary-color);
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem clamp(1rem, 3vw, 1.75rem);
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 -14px 28px -22px rgba(11, 16, 38, 0.35);
 }
 
 .nav-btn {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  flex: none;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.6rem 1.25rem;
+  border: 1.5px solid var(--gold-2);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 0.35s, border-color 0.35s, box-shadow 0.35s, transform 0.35s var(--ease-spring), scale 0.2s var(--ease-out);
 }
 
-.nav-btn:hover {
-  background: var(--secondary-color);
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--gold-fill);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s var(--ease-out);
+  pointer-events: none;
+}
+
+/* "Previous" fills back towards its arrow. */
+.nav-btn:first-child::before {
+  transform-origin: right;
+}
+
+.nav-btn i {
+  display: inline-block;
+  color: var(--gold-deep);
+  transition: color 0.35s, translate 0.35s var(--ease-spring);
+}
+
+.nav-btn:active {
+  scale: 0.97;
+}
+
+.nav-btn:focus-visible {
+  outline-color: var(--gold-deep);
 }
 
 .nav-btn:disabled {
-  background: #cbd5e0;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
-  .books-main {
-    padding-top: 7rem;
+.chapter-select {
+  flex: 1 1 12rem;
+  min-width: 0;
+  max-width: 24rem;
+  min-height: 44px;
+  padding: 0.55rem 2.6rem 0.55rem 1.15rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23b8862b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M3.5 6l4.5 4.5L12.5 6'/%3E%3C/svg%3E") no-repeat right 1rem center / 14px 14px,
+    var(--paper);
+  color: var(--text);
+  font: 600 0.95rem/1.3 var(--font-body);
+  text-overflow: ellipsis;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.chapter-select:focus {
+  border-color: var(--gold-2);
+  box-shadow: 0 0 0 4px rgba(245, 196, 81, 0.25);
+}
+
+.chapter-select:focus-visible {
+  outline-color: var(--gold-deep);
+}
+
+.chapter-select option {
+  background: var(--paper);
+  color: var(--text);
+}
+
+@media (hover: hover) {
+  .close-reader:hover {
+    border-color: var(--gold);
+    background-color: var(--gold);
+    color: var(--ink);
+    box-shadow: 0 0 0 4px rgba(245, 196, 81, 0.18), 0 0 24px rgba(245, 196, 81, 0.45);
   }
 
-  .books-hero h1 {
-    font-size: 2.5rem;
+  .nav-btn:not(:disabled):hover {
+    border-color: var(--gold);
+    box-shadow: var(--shadow-gold);
   }
 
-  .books-hero {
-    padding: 2rem 1rem;
+  .nav-btn:not(:disabled):hover::before {
+    transform: scaleX(1);
   }
 
-  .books-grid {
-    grid-template-columns: 1fr;
-    padding: 1rem;
+  .nav-btn:not(:disabled):hover i {
+    color: var(--ink);
   }
 
-  .book-card {
-    max-width: 400px;
-    margin: 0 auto;
+  .chapter-select:hover {
+    border-color: rgba(228, 176, 74, 0.6);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .close-reader:hover {
+    rotate: 90deg;
   }
 
+  .nav-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+  }
+
+  .nav-btn:first-child:not(:disabled):hover i {
+    translate: -3px 0;
+  }
+
+  .nav-btn:last-child:not(:disabled):hover i {
+    translate: 3px 0;
+  }
+}
+
+/* Reading progress along the header edge, driven by the chapter's scroll position. */
+@keyframes books-progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
   .reader-content {
-    max-height: 95vh;
-  }
-
-  .reader-header h2 {
-    font-size: 1.25rem;
+    timeline-scope: --books-reading;
   }
 
   .reader-body {
-    padding: 1rem;
+    scroll-timeline: --books-reading block;
+  }
+
+  .reader-header::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 3px;
+    background: var(--gold-grad);
+    transform: scaleX(0);
+    transform-origin: left;
+    pointer-events: none;
+    animation: books-progress linear both;
+    animation-timeline: --books-reading;
+  }
+}
+
+/* ---------- Telugu ---------- */
+
+html[lang='te'] :is(.read-btn, .download-btn) {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html[lang='te'] .nav-btn {
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html[lang='te'] .book-info h3 {
+  line-height: 1.6;
+}
+
+html[lang='te'] .book-info .author {
+  font-style: normal;
+}
+
+html[lang='te'] .reader-header h2 {
+  line-height: 1.6;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ---------- Smaller screens ---------- */
+
+@media (max-width: 768px) {
+  .reader-modal {
+    padding: 0.5rem;
+  }
+
+  .reader-content {
+    height: 100%;
+    border-radius: var(--radius-sm);
+  }
+}
+
+@media (max-width: 560px) {
+  .reader-navigation {
+    gap: 0.6rem;
+    padding: 0.75rem;
+  }
+
+  /* Icon-only chapter arrows; the text stays in the DOM as the button's accessible name. */
+  .reader-navigation .nav-btn {
+    width: 46px;
+    min-height: 46px;
+    padding: 0;
+    gap: 0;
+    font-size: 0;
+  }
+
+  .reader-navigation .nav-btn i {
     font-size: 1rem;
   }
 
-  .reader-navigation {
-    padding: 1rem;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
   .chapter-select {
-    width: 100%;
+    max-width: none;
   }
 }
 
 @media (max-width: 480px) {
-  .books-hero h1 {
-    font-size: 2rem;
+  .books-grid {
+    gap: 1.25rem;
   }
 
-  .book-info h3 {
-    font-size: 1.25rem;
+  .book-cover {
+    padding: 1.75rem 1.25rem 1.6rem;
   }
 
-  .book-meta {
-    flex-direction: column;
-    gap: 0.5rem;
+  .book-info {
+    padding: 1.25rem 1.2rem 1.4rem;
+  }
+
+  .reader-header {
+    padding: 0.85rem 0.9rem 0.85rem 1.1rem;
   }
 }

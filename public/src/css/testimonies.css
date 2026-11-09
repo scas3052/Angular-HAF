@@ -1,331 +1,678 @@
-/* Testimonies Page Styles */
+/* ==========================================================================
+   Testimonies - "Midnight & Gold"
+   Searchable, shuffleable story cards that unfold in place.
+   The hero is styled by the shared style.css.
+   ========================================================================== */
+
 .testimonies-main {
-  padding-top: 8rem;
-  min-height: calc(100vh - 300px);
+  padding-bottom: clamp(4rem, 8vw, 6rem);
 }
 
-.testimonies-hero {
-  background: linear-gradient(135deg, rgba(44, 74, 124, 0.1) 0%, rgba(44, 74, 124, 0.05) 100%);
-  padding: 3rem 2rem;
-  text-align: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid rgba(44, 74, 124, 0.1);
-  position: relative;
-  overflow: hidden;
-}
+/* ---------- Search ---------- */
 
-.testimonies-hero::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at center, rgba(44, 74, 124, 0.1) 0%, transparent 70%);
-  z-index: 0;
-}
-
-.testimonies-hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-.testimonies-hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  font-family: 'Cinzel', serif;
-  color: var(--primary-color);
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.testimonies-hero p {
-  font-size: 1.2rem;
-  color: #4a5568;
-}
-
-.testimonies-grid {
-  display: grid;
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.testimony-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-  border: 1px solid rgba(44, 74, 124, 0.1);
-  position: relative;
-}
-
-.testimony-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.testimony-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.testimony-card:hover::before {
-  opacity: 1;
-}
-
-.testimony-content {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.testimony-header {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid rgba(44, 74, 124, 0.1);
-}
-
-.testimony-header i {
-  font-size: 2.5rem;
-  color: var(--primary-color);
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.header-text {
-  flex: 1;
-}
-
-.testimony-header h3 {
-  font-family: 'Cinzel', serif;
-  color: var(--primary-color);
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-}
-
-.role {
-  color: var(--secondary-color);
-  font-style: italic;
-  font-size: 1.1rem;
-  display: block;
-}
-
-.testimony-quote {
-  position: relative;
-  padding-left: 2rem;
-  margin-bottom: 1.5rem;
-}
-
-.testimony-quote i {
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: var(--secondary-color);
-  font-size: 1.5rem;
-  opacity: 0.5;
-}
-
-.testimony-quote p {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: #4a5568;
-}
-
-.read-more-btn {
-  background: none;
-  border: none;
-  color: var(--primary-color);
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: auto;
-  padding: 0.5rem 0;
-  transition: all 0.3s ease;
-}
-
-.read-more-btn:hover {
-  color: var(--secondary-color);
-  transform: translateX(5px);
-}
-
-.testimony-full {
-  max-height: 0;
-  overflow: hidden;
-  transition: all 0.3s ease-out;
-  margin-top: 1.5rem;
-  opacity: 0;
-}
-
-.testimony-card.expanded .testimony-full {
-  opacity: 1;
-  margin-bottom: 1.5rem;
-}
-
-.testimony-full p {
-  margin-bottom: 1rem;
-  line-height: 1.8;
-  color: #4a5568;
-}
-
-.testimony-full p:last-child {
-  margin-bottom: 0;
-}
-
-/* Search Bar Styles */
 .search-container {
-  max-width: 600px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+  position: relative;
+  width: min(100% - 2.5rem, 640px);
+  margin: clamp(2.5rem, 5vw, 3.5rem) auto 0;
+  animation: haf-fade-up 0.8s var(--ease-out) 0.45s backwards;
+}
+
+.search-container::before {
+  content: '\f002';
+  position: absolute;
+  top: 50%;
+  left: 1.4rem;
+  z-index: 1;
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free';
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--muted);
+  translate: 0 -50%;
+  transition: color 0.3s, scale 0.45s var(--ease-spring), rotate 0.45s var(--ease-spring);
+  pointer-events: none;
+}
+
+.search-container:focus-within::before {
+  color: var(--gold-deep);
+  scale: 1.18;
+  rotate: -10deg;
 }
 
 .search-bar {
   width: 100%;
-  padding: 1rem;
-  font-size: 1.1rem;
-  border: 2px solid rgba(44, 74, 124, 0.2);
-  border-radius: 8px;
-  background-color: white;
-  transition: all 0.3s ease;
+  min-height: 56px;
+  padding: 0.85rem 1.5rem 0.85rem 3.35rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--text);
+  font: 500 1.05rem/1.4 var(--font-body);
+  box-shadow: var(--shadow-sm);
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-bar::placeholder {
+  color: var(--muted);
+  opacity: 0.85;
 }
 
 .search-bar:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 10px rgba(44, 74, 124, 0.1);
+  border-color: var(--gold-2);
+  box-shadow: 0 0 0 4px rgba(245, 196, 81, 0.25), var(--shadow-sm);
 }
+
+.search-bar:focus-visible {
+  outline-color: var(--gold-deep);
+}
+
+/* ---------- Shuffle ---------- */
 
 .testimonies-controls {
   display: flex;
-  gap: 10px;
-  margin: 15px auto;
-  max-width: 600px;
-  padding: 0 2rem;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 0.75rem;
+  width: min(100% - 2.5rem, 640px);
+  margin: 1.25rem auto 0;
+  animation: haf-fade-up 0.8s var(--ease-out) 0.6s backwards;
 }
 
 .control-btn {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  display: flex;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 46px;
+  padding: 0.65rem 1.5rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--gold-soft);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 14px 28px -16px rgba(11, 16, 38, 0.75);
+  transition: color 0.35s, border-color 0.35s, box-shadow 0.35s, transform 0.35s var(--ease-spring), scale 0.2s var(--ease-out);
 }
 
-.control-btn:hover {
-  background: var(--secondary-color);
-  transform: translateY(-2px);
+/* Gold fill that wipes across the ink pill. */
+.control-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--gold-fill);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease-out);
+  pointer-events: none;
 }
 
 .control-btn i {
-  font-size: 1rem;
+  display: inline-block;
+  color: var(--gold);
+  transition: color 0.35s, rotate 0.6s var(--ease-spring);
 }
 
+.control-btn:active {
+  scale: 0.96;
+}
+
+.control-btn:focus-visible {
+  outline-color: var(--gold-deep);
+}
+
+/* ---------- Empty search ---------- */
+
+/* Shown through the template's inline display binding. */
 .no-results {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-size: 1.1rem;
   display: none;
+  width: min(100% - 2.5rem, 560px);
+  margin: clamp(2rem, 4vw, 3rem) auto 0;
+  padding: 2.25rem 1.75rem 2rem;
+  border: 1.5px dashed rgba(228, 176, 74, 0.55);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(70% 90% at 50% 0%, rgba(245, 196, 81, 0.12), transparent 70%),
+    var(--paper);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.7;
+  text-align: center;
+  animation: haf-zoom-in 0.5s var(--ease-spring) backwards;
 }
 
+.no-results::before {
+  content: '\f002';
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1.1rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, var(--ink-3), var(--ink) 72%);
+  color: var(--gold);
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free';
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 0 0 6px var(--gold-soft), 0 16px 28px -12px rgba(11, 16, 38, 0.6);
+  animation: haf-pop 0.6s var(--ease-spring) 0.2s backwards, testimonies-seek 4s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+
+.no-results p + p {
+  margin-top: 0.3rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+  font-weight: 400;
+}
+
+@keyframes testimonies-seek {
+  0%,
+  60%,
+  100% {
+    rotate: 0deg;
+  }
+
+  20% {
+    rotate: -14deg;
+  }
+
+  40% {
+    rotate: 10deg;
+  }
+}
+
+/* ---------- Story cards ---------- */
+
+.testimonies-grid {
+  display: grid;
+  gap: clamp(1.15rem, 2.5vw, 1.6rem);
+  width: min(100% - 2.5rem, 860px);
+  margin: clamp(2rem, 4vw, 3rem) auto 0;
+}
+
+/* Revealed on scroll by the motion service, so the card itself carries no CSS animation. */
 .testimony-card {
-  transition: all 0.3s ease;
+  --testimony-avatar: 58px;
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(26rem 12rem at 100% 0%, rgba(245, 196, 81, 0.1), transparent 70%),
+    var(--paper);
+  box-shadow: var(--shadow-sm);
+  transition: translate 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out), border-color 0.4s;
+}
+
+/* Gold accent bar that grows along the left edge. */
+.testimony-card::before {
+  content: '';
+  position: absolute;
+  top: 1.35rem;
+  bottom: 1.35rem;
+  left: -1px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--gold-fill);
+  transform: scaleY(0);
+  transition: transform 0.5s var(--ease-out);
+  pointer-events: none;
+}
+
+/* Closing quotation mark watermarked behind an open story. */
+.testimony-card::after {
+  content: '\f10e';
+  position: absolute;
+  right: clamp(1rem, 3vw, 1.75rem);
+  bottom: 0.6rem;
+  z-index: -1;
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free';
+  font-size: 5rem;
+  font-weight: 900;
+  line-height: 1;
+  color: rgba(245, 196, 81, 0.15);
+  opacity: 0;
+  translate: 0 12px;
+  transition: opacity 0.5s var(--ease-out), translate 0.6s var(--ease-out);
+  pointer-events: none;
+}
+
+.testimony-card:focus-within::before,
+.testimony-card.expanded::before {
+  transform: scaleY(1);
+}
+
+.testimony-card.expanded {
+  border-color: rgba(228, 176, 74, 0.5);
+  box-shadow: var(--shadow), 0 0 40px -18px rgba(245, 196, 81, 0.5);
+}
+
+.testimony-card.expanded::after {
+  opacity: 1;
+  translate: none;
 }
 
 .testimony-card.hidden {
   display: none;
 }
 
-@media (max-width: 768px) {
-  .testimonies-main {
-    padding-top: 7rem;
+.testimony-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 1.5rem;
+  padding: clamp(1.35rem, 3vw, 1.9rem) clamp(1.35rem, 3.5vw, 2.25rem);
+}
+
+/* Gold rule drawn between the name and the unfolded story. */
+.testimony-content::before {
+  content: '';
+  order: 1;
+  grid-column: 1 / -1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold-2), rgba(245, 196, 81, 0.3) 55%, transparent);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.7s var(--ease-out), opacity 0.3s, margin-top 0.45s var(--ease-out);
+  pointer-events: none;
+}
+
+.testimony-card.expanded .testimony-content::before {
+  margin-top: 1.35rem;
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* ---------- Card header ---------- */
+
+.testimony-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.15rem;
+  min-width: 0;
+}
+
+/* Ink medallion with a gold portrait glyph. */
+.testimony-header i {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--testimony-avatar);
+  height: var(--testimony-avatar);
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, var(--ink-3), var(--ink) 72%);
+  color: var(--gold);
+  font-size: calc(var(--testimony-avatar) * 0.5);
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(245, 196, 81, 0.35), 0 12px 24px -12px rgba(11, 16, 38, 0.7);
+  animation: haf-pop 0.6s var(--ease-spring) 0.3s backwards;
+  transition: scale 0.45s var(--ease-spring), box-shadow 0.45s;
+}
+
+/* Dashed gold orbit around the medallion. */
+.testimony-header i::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border: 1.5px dashed rgba(228, 176, 74, 0.6);
+  border-radius: 50%;
+  transition: rotate 1.2s var(--ease-out), border-color 0.4s;
+  pointer-events: none;
+}
+
+/* Quotation badge pinned to the medallion's rim. */
+.testimony-header::after {
+  content: '\f10d';
+  position: absolute;
+  top: calc(var(--testimony-avatar) - 20px);
+  left: calc(var(--testimony-avatar) - 20px);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  background: var(--gold-fill);
+  color: var(--ink);
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free';
+  font-size: 0.6rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 6px 12px -6px rgba(184, 134, 43, 0.9);
+  animation: haf-pop 0.5s var(--ease-spring) 0.65s backwards;
+  transition: rotate 0.45s var(--ease-spring), scale 0.45s var(--ease-spring);
+  pointer-events: none;
+}
+
+.testimony-card:focus-within .testimony-header i::after,
+.testimony-card.expanded .testimony-header i::after {
+  border-color: var(--gold-2);
+  rotate: 180deg;
+}
+
+.header-text {
+  align-self: center;
+  min-width: 0;
+}
+
+.testimony-header h3 {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  padding-bottom: 0.4rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.12rem, 0.45vw + 1rem, 1.35rem);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.testimony-header h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 1.75rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold-2), var(--gold) 60%, rgba(245, 196, 81, 0));
+  transition: width 0.6s var(--ease-out);
+  pointer-events: none;
+}
+
+.testimony-card:focus-within .testimony-header h3::after,
+.testimony-card.expanded .testimony-header h3::after {
+  width: 100%;
+}
+
+.testimony-header .role {
+  display: block;
+  margin-top: 0.3rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-style: italic;
+}
+
+.testimony-header .role:empty {
+  display: none;
+}
+
+/* ---------- Read more / less ---------- */
+
+.read-more-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 46px;
+  padding: 0.65rem 1.35rem;
+  border: 1.5px solid var(--gold-2);
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.35s, background-color 0.35s, border-color 0.35s, box-shadow 0.35s, transform 0.35s var(--ease-spring), scale 0.2s var(--ease-out);
+}
+
+.read-more-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--gold-fill);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.45s var(--ease-out);
+  pointer-events: none;
+}
+
+.read-more-btn i {
+  display: inline-block;
+  color: var(--gold-deep);
+  font-size: 0.8em;
+  transition: color 0.35s, translate 0.35s var(--ease-spring);
+}
+
+.read-more-btn:active {
+  scale: 0.97;
+}
+
+.read-more-btn:focus-visible {
+  outline-color: var(--gold-deep);
+}
+
+.testimony-card.expanded .read-more-btn {
+  border-color: var(--ink);
+  background-color: var(--ink);
+  color: var(--gold-soft);
+}
+
+.testimony-card.expanded .read-more-btn i {
+  color: var(--gold);
+  animation: haf-pop 0.45s var(--ease-spring) backwards;
+}
+
+/* ---------- Unfolding story ---------- */
+
+/* Collapsed by default; the card sets the open height inline from its measured scrollHeight. */
+.testimony-full {
+  order: 2;
+  grid-column: 1 / -1;
+  max-height: 0;
+  margin-top: 0;
+  overflow: hidden;
+  opacity: 0;
+  color: var(--text);
+  font-size: clamp(1rem, 0.25vw + 0.95rem, 1.08rem);
+  line-height: 1.85;
+  text-wrap: pretty;
+  transition: max-height 0.55s var(--ease-out), opacity 0.45s var(--ease-out), margin-top 0.45s var(--ease-out);
+}
+
+.testimony-card.expanded .testimony-full {
+  margin-top: 1.25rem;
+  opacity: 1;
+}
+
+.testimony-full p {
+  margin-bottom: 1rem;
+}
+
+.testimony-full p:last-child {
+  margin-bottom: 0;
+}
+
+.testimony-full ::selection {
+  background: rgba(245, 196, 81, 0.35);
+  color: var(--ink);
+}
+
+/* ---------- Hover (colour and light) ---------- */
+
+@media (hover: hover) {
+  .search-bar:hover:not(:focus) {
+    border-color: rgba(228, 176, 74, 0.5);
   }
 
-  .testimonies-hero h1 {
-    font-size: 2.5rem;
+  .control-btn:hover {
+    border-color: var(--gold-2);
+    color: var(--ink);
+    box-shadow: var(--shadow-gold);
   }
 
-  .testimonies-hero {
-    padding: 2rem 1rem;
+  .control-btn:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
   }
 
-  .testimonies-grid {
-    padding: 1rem;
+  .control-btn:hover i {
+    color: var(--ink);
+    rotate: 180deg;
   }
 
-  .testimony-header h3 {
-    font-size: 1.5rem;
+  .testimony-card:hover {
+    border-color: rgba(228, 176, 74, 0.5);
+    box-shadow: var(--shadow), 0 0 40px -18px rgba(245, 196, 81, 0.5);
   }
 
-  .testimony-quote p {
-    font-size: 1rem;
+  .testimony-card:hover::before {
+    transform: scaleY(1);
   }
 
-  .search-container {
-    padding: 0 1rem;
+  .testimony-card:hover .testimony-header h3::after {
+    width: 100%;
   }
-  
-  .search-bar {
-    font-size: 1rem;
-    padding: 0.8rem;
+
+  .testimony-card:hover .testimony-header i::after {
+    border-color: var(--gold-2);
+    rotate: 180deg;
+  }
+
+  .read-more-btn:hover {
+    border-color: var(--gold);
+    color: var(--ink);
+    box-shadow: var(--shadow-gold);
+  }
+
+  .read-more-btn:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .read-more-btn:hover i,
+  .testimony-card.expanded .read-more-btn:hover i {
+    color: var(--ink);
+  }
+
+  .testimony-card.expanded .read-more-btn:hover {
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+}
+
+/* ---------- Hover (movement, fine pointers only) ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .testimony-card:not(.expanded):hover {
+    translate: 0 -4px;
+  }
+
+  .testimony-card:hover .testimony-header i {
+    scale: 1.06;
+  }
+
+  .testimony-card:hover .testimony-header::after {
+    rotate: -14deg;
+    scale: 1.15;
+  }
+
+  .control-btn:hover,
+  .read-more-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .read-more-btn:hover i {
+    translate: 0 2px;
+  }
+
+  .testimony-card.expanded .read-more-btn:hover i {
+    translate: 0 -2px;
+  }
+}
+
+/* ---------- Telugu ---------- */
+
+html[lang='te'] :is(.control-btn, .read-more-btn) {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html[lang='te'] .testimony-header h3 {
+  line-height: 1.6;
+  letter-spacing: normal;
+}
+
+html[lang='te'] .testimony-header .role {
+  font-style: normal;
+}
+
+html[lang='te'] .testimony-full {
+  line-height: 1.95;
+}
+
+/* ---------- Layout by width ---------- */
+
+/* On wider cards the story hangs under the name, beside the medallion. */
+@media (min-width: 641px) {
+  .testimony-full {
+    padding-left: calc(var(--testimony-avatar) + 1.15rem);
+  }
+
+  .testimony-content::before {
+    margin-left: calc(var(--testimony-avatar) + 1.15rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .testimony-card {
+    --testimony-avatar: 50px;
+  }
+
+  .testimony-content {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .read-more-btn {
+    justify-self: start;
+    margin-top: 1.1rem;
+    white-space: normal;
+  }
+
+  .testimony-card::after {
+    font-size: 4rem;
   }
 }
 
 @media (max-width: 480px) {
-  .testimonies-hero h1 {
-    font-size: 2rem;
-  }
-
-  .testimony-content {
-    padding: 1.5rem;
+  .search-bar {
+    min-height: 52px;
+    font-size: 1rem;
   }
 
   .testimony-header {
     gap: 1rem;
   }
 
-  .testimony-header i {
-    font-size: 2rem;
-  }
-
-  .testimony-header h3 {
-    font-size: 1.25rem;
-  }
-
-  .testimony-quote {
-    padding-left: 1.5rem;
-  }
-
-  .testimony-quote i {
-    font-size: 1.25rem;
-  }
-
-  .role {
-    font-size: 0.9rem;
+  .no-results {
+    padding: 1.85rem 1.25rem 1.6rem;
   }
 }

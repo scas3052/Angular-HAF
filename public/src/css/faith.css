@@ -1,268 +1,194 @@
-/* Faith Page Styles */
+/*
+ * Statement of Faith - "Midnight & Gold"
+ *
+ * Loaded after style.css only while the faith page (English or Telugu) is open.
+ * The hero (.faith-hero, .faith-hero-content, its h1 and p) is styled entirely
+ * by style.css, so nothing here touches it.
+ *
+ * .belief-item and .belief-spotlight are revealed on scroll by the motion
+ * service (Web Animations on opacity and transform), so they never get a CSS
+ * animation or a transform of their own: hover lifts use the individual
+ * `translate` property and every other effect lives on children and
+ * pseudo-elements.
+ */
+
+/* ---------- Page canvas ---------- */
+
 .faith-main {
-  padding-top: 8rem;
-  min-height: calc(100vh - 300px);
-}
-
-.faith-hero {
-  background: linear-gradient(to right, rgba(44, 74, 124, 0.05), rgba(44, 74, 124, 0.1));
-  padding: 3rem 2rem;
-  text-align: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.faith-hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.faith-hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  font-family: 'Cinzel', serif;
-  color: var(--primary-color);
-}
-
-.faith-hero p {
-  font-size: 1.2rem;
-  color: #4a5568;
+  display: block;
+  background:
+    radial-gradient(52rem 36rem at 100% 30%, rgba(245, 196, 81, 0.1), transparent 70%),
+    radial-gradient(46rem 34rem at 0% 72%, rgba(75, 47, 122, 0.07), transparent 70%),
+    var(--cream);
 }
 
 .faith-content {
-  padding: 2rem;
-  max-width: 1400px;
+  max-width: 1240px;
   margin: 0 auto;
+  padding: clamp(3.5rem, 7vw, 6rem) clamp(1rem, 4vw, 2rem) clamp(4.5rem, 8vw, 7rem);
 }
 
-/* Spotlight (Repentance) Section */
-.belief-spotlight {
-  position: relative;
-  margin: 4rem auto;
-  padding: 0 2rem;
-  max-width: 1200px;
-}
+/* ---------- Belief cards ---------- */
 
-.belief-spotlight::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
-}
-
-.belief-spotlight-content {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
-  border-radius: 30px;
-  padding: 3rem;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 20px 40px rgba(44, 74, 124, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.belief-spotlight-icon {
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 2rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
-}
-
-.belief-spotlight-icon::before,
-.belief-spotlight-icon::after {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-  animation: pulse 3s infinite;
-}
-
-.belief-spotlight-icon::before {
-  inset: -15px;
-  border: 2px solid var(--secondary-color);
-  opacity: 0.5;
-}
-
-.belief-spotlight-icon::after {
-  inset: -30px;
-  border: 2px solid var(--primary-color);
-  opacity: 0.3;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 0.2; }
-  100% { transform: scale(1); opacity: 0.5; }
-}
-
-.belief-spotlight-icon i {
-  font-size: 3rem;
-  color: white;
-}
-
-.belief-spotlight h2 {
-  font-size: 2.8rem;
-  color: var(--primary-color);
-  margin-bottom: 1.5rem;
-  font-family: 'Cinzel', serif;
-  position: relative;
-  display: inline-block;
-}
-
-.belief-spotlight h2::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-}
-
-.belief-spotlight p {
-  font-size: 1.2rem;
-  line-height: 1.8;
-  color: #4a5568;
-  max-width: 800px;
-  margin: 0 auto 2rem;
-}
-
-.scripture-highlight {
-  background: linear-gradient(135deg, rgba(44, 74, 124, 0.05), rgba(255, 193, 7, 0.05));
-  border-radius: 20px;
-  padding: 2rem;
-  position: relative;
-  max-width: 800px;
-  margin: 0 auto;
-  border-left: 4px solid var(--secondary-color);
-}
-
-.scripture-highlight q {
-  font-style: italic;
-  color: var(--primary-color);
-  font-size: 1.3rem;
-  line-height: 1.8;
-  display: block;
-  margin-bottom: 1rem;
-}
-
-.scripture-highlight cite {
-  color: var(--secondary-color);
-  font-weight: 600;
-  display: block;
-  text-align: right;
-}
-
-/* Beliefs Flow Section */
 .beliefs-flow {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem;
-  justify-content: center;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  counter-reset: faith-belief;
 }
 
 .belief-item {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.98));
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(44, 74, 124, 0.1);
-  transition: all 0.3s ease;
   position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  min-width: 0;
+  padding: clamp(1.6rem, 3vw, 2.25rem);
   overflow: hidden;
-  animation: fadeIn 0.6s ease-out forwards;
-  opacity: 0;
+  overflow-wrap: break-word;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(20rem 14rem at 0% 0%, rgba(245, 196, 81, 0.13), transparent 70%),
+    linear-gradient(180deg, var(--paper) 40%, color-mix(in srgb, var(--cream) 60%, var(--paper)));
+  box-shadow: var(--shadow-sm);
+  counter-increment: faith-belief;
+  transition:
+    translate 0.55s var(--ease-spring),
+    box-shadow 0.45s var(--ease-out),
+    border-color 0.45s var(--ease-out);
 }
 
-.belief-item:nth-child(1) { animation-delay: 0.1s; }
-.belief-item:nth-child(2) { animation-delay: 0.2s; }
-.belief-item:nth-child(3) { animation-delay: 0.3s; }
-.belief-item:nth-child(4) { animation-delay: 0.4s; }
-.belief-item:nth-child(5) { animation-delay: 0.5s; }
-.belief-item:nth-child(6) { animation-delay: 0.6s; }
-.belief-item:nth-child(7) { animation-delay: 0.7s; }
-.belief-item:nth-child(8) { animation-delay: 0.8s; }
-
+/* A short gold accent on the top edge that draws across the whole card on hover. */
 .belief-item::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(44, 74, 124, 0.05), rgba(255, 193, 7, 0.05));
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--gold-grad);
+  background-size: 200% auto;
+  transform: scaleX(0.22);
+  transform-origin: left;
+  transition: transform 0.7s var(--ease-out);
+  pointer-events: none;
+}
+
+/* Warm glow that blooms behind the content on hover. */
+.belief-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(26rem 18rem at 12% 0%, rgba(245, 196, 81, 0.22), transparent 70%),
+    radial-gradient(22rem 16rem at 100% 100%, rgba(75, 47, 122, 0.07), transparent 70%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s var(--ease-out);
+  pointer-events: none;
 }
 
-.belief-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 35px rgba(44, 74, 124, 0.15);
-}
-
-.belief-item:hover::before {
-  opacity: 1;
-}
-
+/* Gold medallion icon */
 .belief-icon {
-  flex-shrink: 0;
-  width: 70px;
-  height: 70px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 4.25rem;
+  height: 4.25rem;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+  background: var(--gold-fill);
+  color: var(--ink);
+  font-size: 1.6rem;
+  box-shadow:
+    0 12px 26px -10px rgba(184, 134, 43, 0.7),
+    0 0 0 6px rgba(245, 196, 81, 0.12),
+    inset 0 0 0 4px rgba(255, 255, 255, 0.35);
+  transition:
+    rotate 0.55s var(--ease-spring),
+    scale 0.55s var(--ease-spring),
+    box-shadow 0.45s var(--ease-out);
+  animation: haf-pop 0.8s var(--ease-out) 0.4s backwards;
 }
 
-.belief-icon i {
-  font-size: 1.8rem;
-  color: white;
-  transition: all 0.3s ease;
+.belief-item:nth-child(3n + 2) .belief-icon {
+  animation-delay: 0.52s;
+}
+
+.belief-item:nth-child(3n) .belief-icon {
+  animation-delay: 0.64s;
+}
+
+/* Dashed halo that starts turning when the card is hovered. */
+.belief-icon::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border: 1.5px dashed rgba(184, 134, 43, 0.5);
+  border-radius: 50%;
+  opacity: 0.45;
+  transition: opacity 0.45s var(--ease-out), inset 0.45s var(--ease-out);
+  animation: haf-spin 14s linear infinite paused;
+  pointer-events: none;
+}
+
+/* Glint that sweeps across the medallion on hover. */
+.belief-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.7) 50%, transparent 62%) 160% 0 / 260% 100% no-repeat;
+  transition: background-position 0.9s var(--ease-out);
+  pointer-events: none;
 }
 
 .belief-text {
-  flex: 1;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* Outlined ordinal in the top corner of each card. */
+.belief-text::before {
+  content: counter(faith-belief, decimal-leading-zero);
+  content: counter(faith-belief, decimal-leading-zero) / '';
+  position: absolute;
+  top: clamp(1.35rem, 2.6vw, 1.85rem);
+  right: clamp(1.35rem, 2.6vw, 2rem);
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(184, 134, 43, 0.42);
+  transition:
+    color 0.45s var(--ease-out),
+    -webkit-text-stroke-color 0.45s var(--ease-out),
+    transform 0.55s var(--ease-spring);
+  animation: haf-fade-down 0.8s var(--ease-out) 0.55s backwards;
+  pointer-events: none;
+}
+
+.belief-item:nth-child(3n + 2) .belief-text::before {
+  animation-delay: 0.67s;
+}
+
+.belief-item:nth-child(3n) .belief-text::before {
+  animation-delay: 0.79s;
 }
 
 .belief-text h3 {
-  color: var(--primary-color);
-  font-family: 'Cinzel', serif;
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
   position: relative;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.8rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 0.5vw + 1.05rem, 1.4rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+  text-wrap: balance;
 }
 
 .belief-text h3::after {
@@ -270,140 +196,482 @@
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 0;
+  width: 6.5rem;
+  max-width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  transition: width 0.3s ease;
-}
-
-.belief-item:hover .belief-text h3::after {
-  width: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold-2), rgba(228, 176, 74, 0));
+  transform: scaleX(0.45);
+  transform-origin: left;
+  transition: transform 0.6s var(--ease-out);
+  pointer-events: none;
 }
 
 .belief-text p {
-  color: #4a5568;
-  line-height: 1.6;
-  font-size: 1rem;
-  transition: all 0.3s ease;
+  margin: 0.95rem 0 1.5rem;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.75;
+  text-wrap: pretty;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-  .belief-spotlight {
-    margin: 3rem auto;
+/* ---------- Scripture quotes ---------- */
+
+.scripture-highlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: auto;
+  padding: 1.4rem 1.25rem 1.1rem 1.5rem;
+  border-left: 3px solid var(--gold-2);
+  border-radius: 4px var(--radius-sm) var(--radius-sm) 4px;
+  background: linear-gradient(135deg, var(--cream), color-mix(in srgb, var(--gold-soft) 75%, var(--cream)));
+  transition: border-color 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+
+/* Oversized quotation mark watermark */
+.scripture-highlight::before {
+  content: '\201C';
+  content: '\201C' / '';
+  position: absolute;
+  top: -0.35rem;
+  right: 0.7rem;
+  z-index: -1;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 5rem;
+  line-height: 1;
+  color: rgba(228, 176, 74, 0.3);
+  transition: color 0.45s var(--ease-out), transform 0.55s var(--ease-spring);
+  pointer-events: none;
+}
+
+.scripture-highlight q {
+  display: block;
+  font-size: 0.98rem;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.scripture-highlight q::before,
+.scripture-highlight q::after {
+  color: var(--gold-deep);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.scripture-highlight cite {
+  display: block;
+  margin-top: 0.8rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: right;
+  color: color-mix(in srgb, var(--gold-deep) 65%, var(--ink));
+}
+
+/* ---------- Spotlight: Repentance ---------- */
+
+.belief-spotlight {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  max-width: 1040px;
+  margin: clamp(3.5rem, 8vw, 6rem) auto 0;
+  padding: clamp(3rem, 7vw, 5rem) clamp(1.25rem, 6vw, 4.5rem);
+  border: 1px solid rgba(245, 196, 81, 0.35);
+  border-radius: calc(var(--radius) + 10px);
+  background: var(--ink-grad);
+  color: #fff;
+  text-align: center;
+  box-shadow:
+    0 44px 90px -46px rgba(11, 16, 38, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: border-color 0.6s var(--ease-out), box-shadow 0.6s var(--ease-out);
+}
+
+/* Static starfield... */
+.belief-spotlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(1.2px 1.2px at 24px 36px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 140px 90px, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1.6px 1.6px at 70px 170px, rgba(255, 228, 160, 0.9), transparent),
+    radial-gradient(1px 1px at 200px 30px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1.3px 1.3px at 250px 210px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 310px 120px, rgba(255, 240, 200, 0.7), transparent);
+  background-size: 220px 220px, 290px 290px, 340px 340px, 260px 260px, 330px 330px, 380px 380px;
+  -webkit-mask-image: radial-gradient(120% 95% at 50% 0%, #000 45%, transparent 100%);
+  mask-image: radial-gradient(120% 95% at 50% 0%, #000 45%, transparent 100%);
+  pointer-events: none;
+}
+
+/* ...over a slowly drifting aurora. */
+.belief-spotlight::after {
+  content: '';
+  position: absolute;
+  inset: -30% -20%;
+  z-index: -2;
+  background:
+    radial-gradient(36% 34% at 50% 18%, rgba(245, 196, 81, 0.24), transparent 70%),
+    radial-gradient(40% 42% at 18% 70%, rgba(75, 47, 122, 0.7), transparent 70%),
+    radial-gradient(44% 44% at 84% 76%, rgba(44, 74, 124, 0.6), transparent 70%);
+  animation: haf-aurora 20s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.belief-spotlight-content {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+/* Floating medallion with a turning comet ring and a soft pulse. */
+.belief-spotlight-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 auto 1.9rem;
+  border-radius: 50%;
+  background: var(--gold-fill);
+  color: var(--ink);
+  font-size: 2.1rem;
+  box-shadow:
+    0 18px 40px -14px rgba(245, 196, 81, 0.65),
+    inset 0 0 0 5px rgba(255, 255, 255, 0.3);
+  transition: scale 0.55s var(--ease-spring);
+  animation: haf-float 6s ease-in-out infinite;
+}
+
+.belief-spotlight-icon::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 18%,
+    rgba(245, 196, 81, 0.95) 32%,
+    transparent 46% 62%,
+    rgba(255, 244, 207, 0.8) 78%,
+    transparent 92%
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 1.5px));
+  animation: haf-spin 16s linear infinite;
+  pointer-events: none;
+}
+
+.belief-spotlight-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  animation: haf-pulse-ring 3.2s ease-out infinite;
+  pointer-events: none;
+}
+
+.belief-spotlight-content h2 {
+  margin-bottom: 1.4rem;
+  padding-block: 0.06em;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3vw + 1rem, 3.2rem);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: 0.04em;
+  text-wrap: balance;
+  color: var(--gold);
+  background: var(--gold-grad);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: haf-shimmer 8s linear infinite;
+}
+
+.belief-spotlight-content h2::after {
+  content: '';
+  display: block;
+  width: 110px;
+  height: 14px;
+  margin: 1rem auto 0;
+  background:
+    radial-gradient(circle, var(--gold) 0 3.5px, transparent 4px) center / 14px 14px no-repeat,
+    linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold) 70%, transparent) center / 100% 2px no-repeat;
+}
+
+.belief-spotlight-content > p {
+  max-width: 62ch;
+  margin: 0 auto 2.1rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(1.05rem, 0.35vw + 0.98rem, 1.2rem);
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+
+.belief-spotlight .scripture-highlight {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 2.1rem clamp(1.25rem, 4vw, 2.5rem) 1.5rem;
+  border: 1px solid rgba(245, 196, 81, 0.38);
+  border-radius: var(--radius);
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.belief-spotlight .scripture-highlight::before {
+  top: -1.1rem;
+  right: auto;
+  left: 50%;
+  translate: -50% 0;
+  font-size: 6rem;
+  color: rgba(245, 196, 81, 0.28);
+}
+
+.belief-spotlight .scripture-highlight q {
+  font-size: clamp(1.02rem, 0.3vw + 0.98rem, 1.14rem);
+  color: var(--gold-soft);
+}
+
+.belief-spotlight .scripture-highlight q::before,
+.belief-spotlight .scripture-highlight q::after {
+  color: var(--gold);
+}
+
+.belief-spotlight .scripture-highlight cite {
+  text-align: center;
+  color: var(--gold);
+}
+
+/* ---------- Hover micro-interactions (fine pointers only) ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .belief-item:hover {
+    translate: 0 -8px;
+    border-color: rgba(228, 176, 74, 0.55);
+    box-shadow: var(--shadow), 0 0 46px -16px rgba(245, 196, 81, 0.6);
   }
-  
+
+  .belief-item:hover::before {
+    transform: scaleX(1);
+    animation: haf-shimmer 3s linear infinite;
+  }
+
+  .belief-item:hover::after {
+    opacity: 1;
+  }
+
+  .belief-item:hover .belief-icon {
+    rotate: -8deg;
+    scale: 1.08;
+    box-shadow:
+      0 16px 30px -10px rgba(184, 134, 43, 0.75),
+      0 0 0 9px rgba(245, 196, 81, 0.18),
+      inset 0 0 0 4px rgba(255, 255, 255, 0.45);
+  }
+
+  .belief-item:hover .belief-icon::before {
+    inset: -12px;
+    opacity: 1;
+    animation-play-state: running;
+  }
+
+  .belief-item:hover .belief-icon::after {
+    background-position: -60% 0;
+  }
+
+  .belief-item:hover .belief-icon i {
+    animation: faith-pop 0.65s var(--ease-out);
+  }
+
+  .belief-item:hover .belief-text::before {
+    color: rgba(245, 196, 81, 0.22);
+    -webkit-text-stroke-color: var(--gold-2);
+    transform: translateY(-4px);
+  }
+
+  .belief-item:hover .belief-text h3::after {
+    transform: scaleX(1);
+  }
+
+  .belief-item:hover .scripture-highlight {
+    border-left-color: var(--gold);
+    box-shadow: inset 0 0 0 1px rgba(228, 176, 74, 0.22);
+  }
+
+  .belief-item:hover .scripture-highlight::before {
+    color: rgba(228, 176, 74, 0.5);
+    transform: translateY(-3px) rotate(-8deg) scale(1.1);
+  }
+
+  .belief-spotlight:hover {
+    border-color: rgba(245, 196, 81, 0.6);
+    box-shadow:
+      0 44px 90px -46px rgba(11, 16, 38, 0.85),
+      0 0 70px -24px rgba(245, 196, 81, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .belief-spotlight:hover .belief-spotlight-icon {
+    scale: 1.06;
+  }
+
+  .belief-spotlight:hover .scripture-highlight::before {
+    color: rgba(245, 196, 81, 0.42);
+    transform: translateY(-3px) scale(1.08);
+  }
+}
+
+@keyframes faith-pop {
+  0% { scale: 1; }
+  40% { scale: 1.28; }
+  70% { scale: 0.94; }
+  100% { scale: 1; }
+}
+
+/* ---------- Telugu ---------- */
+
+html[lang='te'] .belief-text h3 {
+  line-height: 1.55;
+}
+
+html[lang='te'] .belief-text p,
+html[lang='te'] .belief-spotlight-content > p {
+  line-height: 1.95;
+}
+
+html[lang='te'] .scripture-highlight q {
+  font-style: normal;
+  line-height: 1.95;
+}
+
+html[lang='te'] .belief-text::before,
+html[lang='te'] .scripture-highlight cite {
+  letter-spacing: normal;
+}
+
+html[lang='te'] .belief-spotlight-content h2 {
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (min-width: 720px) {
   .beliefs-flow {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 720px) and (max-width: 1079.98px) {
+  /* With two columns the ninth card would sit alone, so centre it. */
+  .belief-item:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(100%, 34rem);
+  }
+}
+
+@media (min-width: 1080px) {
+  .beliefs-flow {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .faith-main {
-    padding-top: 7rem;
-  }
-
-  .faith-hero h1 {
-    font-size: 2.5rem;
-  }
-
   .belief-spotlight {
-    margin: 2rem 1rem;
-    padding: 0 1rem;
-  }
-
-  .belief-spotlight-content {
-    padding: 2rem 1.5rem;
-  }
-
-  .belief-spotlight-icon {
-    width: 100px;
-    height: 100px;
-  }
-
-  .belief-spotlight-icon i {
-    font-size: 2.5rem;
-  }
-
-  .belief-spotlight h2 {
-    font-size: 2.2rem;
-  }
-
-  .belief-spotlight p {
-    font-size: 1.1rem;
-  }
-
-  .scripture-highlight {
-    padding: 1.5rem;
-  }
-
-  .scripture-highlight q {
-    font-size: 1.1rem;
-  }
-
-  .beliefs-flow {
-    padding: 1rem;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-  }
-
-  .belief-item {
-    padding: 1.25rem;
+    border-radius: var(--radius);
   }
 }
 
 @media (max-width: 480px) {
-  .belief-spotlight-content {
-    padding: 1.5rem 1rem;
-  }
-
-  .belief-spotlight-icon {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 1.5rem;
-  }
-
-  .belief-spotlight-icon i {
-    font-size: 2rem;
-  }
-
-  .belief-spotlight h2 {
-    font-size: 2rem;
-  }
-
-  .belief-spotlight p {
-    font-size: 1rem;
-  }
-
-  .scripture-highlight {
-    padding: 1.25rem;
-  }
-
-  .scripture-highlight q {
-    font-size: 1rem;
-  }
-
   .belief-item {
-    flex-direction: column;
-    text-align: center;
-    gap: 1rem;
+    gap: 1.15rem;
   }
 
   .belief-icon {
-    width: 60px;
-    height: 60px;
+    width: 3.6rem;
+    height: 3.6rem;
+    font-size: 1.35rem;
   }
 
-  .belief-icon i {
-    font-size: 1.5rem;
+  .belief-text::before {
+    font-size: 2.1rem;
   }
 
-  .belief-text h3 {
-    font-size: 1.3rem;
+  .scripture-highlight {
+    padding: 1.25rem 1rem 1rem 1.2rem;
   }
 
-  .belief-text h3::after {
-    left: 50%;
-    transform: translateX(-50%);
+  .belief-spotlight-icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    font-size: 1.7rem;
+  }
+
+  .belief-spotlight .scripture-highlight {
+    padding: 1.9rem 1.1rem 1.35rem;
+  }
+
+  .belief-spotlight .scripture-highlight::before {
+    font-size: 4.75rem;
+  }
+}
+
+/* ---------- Print: dark panels and gradient text do not print ---------- */
+
+@media print {
+  .faith-main {
+    background: none;
+  }
+
+  .belief-item,
+  .belief-spotlight {
+    break-inside: avoid;
+    box-shadow: none;
+  }
+
+  .belief-item::before,
+  .belief-item::after,
+  .belief-icon::before,
+  .belief-icon::after,
+  .belief-spotlight::before,
+  .belief-spotlight::after,
+  .belief-spotlight-icon::before,
+  .belief-spotlight-icon::after {
+    display: none;
+  }
+
+  .belief-spotlight {
+    border-color: var(--line);
+    background: none;
+    color: var(--text);
+  }
+
+  .belief-spotlight-content h2 {
+    background: none;
+    color: var(--ink);
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .belief-spotlight-content > p,
+  .belief-spotlight .scripture-highlight q {
+    color: var(--text);
+  }
+
+  .belief-spotlight .scripture-highlight {
+    border-color: var(--line);
+    background: none;
+  }
+
+  .belief-spotlight .scripture-highlight cite {
+    color: var(--ink);
   }
 }

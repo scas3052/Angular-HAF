@@ -19,9 +19,6 @@ export class SiteHeader {
   readonly menuOpen = signal(false);
   readonly dropdownOpen = signal(false);
   readonly transparent = signal(window.scrollY > 100);
-  readonly navigationBackground = computed(() => this.transparent()
-    ? 'rgba(255, 255, 255, 0.95)'
-    : 'linear-gradient(135deg, #1a1f3c 0%, #2c4a7c 50%, #1a1f3c 100%)');
 
   constructor() {
     effect(() => {

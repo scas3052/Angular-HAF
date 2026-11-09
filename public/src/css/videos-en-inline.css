@@ -1,15 +1,14 @@
-
-      .video-thumbnail {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9; /* This ensures the div has a height */
-    background-color: #000;
-    overflow: hidden;
+/* English route extras; kept in step with videos.css. */
+.video-thumbnail {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--ink, #0b1026);
 }
 
 .video-thumbnail-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-    

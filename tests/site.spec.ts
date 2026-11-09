@@ -1,8 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import { PNG } from 'pngjs';
-import pixelmatch from 'pixelmatch';
 import { legacyPageUrls } from '../src/app/page-urls';
 import { serviceSchedule } from '../src/app/features/service-schedule';
 
@@ -114,8 +112,7 @@ const intentionalTextChanges: Record<string, [string, string][]> = {
   'Telugu/books-telugu.html': [['Previous Chapter', 'మునుపటి అధ్యాయం'], ['Next Chapter', 'తదుపరి అధ్యాయం']]
 };
 
-const hideFooter = (target: Page) => target.addStyleTag({ content: 'footer { display: none !important; }' });
-
+// The site has an animated redesign, so pages keep the original wording but are no longer compared pixel by pixel.
 for (const entry of pages) {
   test(`page parity: ${entry.path}`, async ({ page, context }, testInfo) => {
     const errors: string[] = [];
@@ -144,23 +141,8 @@ for (const entry of pages) {
             opacity: getComputedStyle(image).opacity, itemOpacity: getComputedStyle(image.closest('.gallery-item')!).opacity };
         }));
         await testInfo.attach(`${name}-images`, { body: JSON.stringify(imageState, null, 2), contentType: 'application/json' });
-        writeFileSync(testInfo.outputPath(`${name}-images.json`), JSON.stringify(imageState, null, 2));
       }
     }
-    await Promise.all([hideFooter(page), hideFooter(original)]);
-    // Gallery photos are now pre-resized WebP copies, so only their position and size are compared.
-    const masked = (target: Page) => [target.locator('iframe'), ...(entry.kind === 'gallery' ? [target.locator('.gallery-item img')] : [])];
-    const actualBytes = await page.screenshot({ path: testInfo.outputPath('angular.png'), fullPage: true, animations: 'disabled', mask: masked(page) });
-    const originalBytes = await original.screenshot({ path: testInfo.outputPath('original.png'), fullPage: true, animations: 'disabled', mask: masked(original) });
-    const actual = PNG.sync.read(actualBytes);
-    const expected = PNG.sync.read(originalBytes);
-    expect({ width: actual.width, height: actual.height }).toEqual({ width: expected.width, height: expected.height });
-    const difference = new PNG({ width: actual.width, height: actual.height });
-    const changed = pixelmatch(actual.data, expected.data, difference.data, actual.width, actual.height, { threshold: 0.15 });
-    const ratio = changed / (actual.width * actual.height);
-    writeFileSync(testInfo.outputPath('difference.png'), PNG.sync.write(difference));
-    testInfo.annotations.push({ type: 'pixel-difference', description: `${(ratio * 100).toFixed(4)}%` });
-    expect(ratio, 'Rendered pixels should match the original design').toBeLessThan(0.002);
     await original.close();
   });
 }
@@ -182,27 +164,38 @@ for (const state of [
   { name: 'email form', path: 'English/prayer-request-english.html', clicks: ['.method-btn:not(.active)'], selector: '.form-container' },
   { name: 'expanded testimony', path: 'Telugu/testimonies-telugu.html', clicks: ['.read-more-btn'], selector: '.testimony-card.expanded .testimony-full' }
 ]) {
-  test(`expanded state parity: ${state.name}`, async ({ page, context }, testInfo) => {
-    test.skip(!hasOriginal, 'Original website is needed for visual comparison.');
-    const original = await context.newPage();
-    for (const [current, url] of [[page, 'http://127.0.0.1:4201' + appPath(state.path)], [original, 'http://127.0.0.1:4173/' + state.path]] as const) {
-      await current.goto(url, { waitUntil: 'domcontentloaded' });
-      await expect(current.locator('header')).toBeVisible();
-      await settle(current);
-      for (const selector of state.clicks) await current.locator(selector).first().click();
-      await expect(current.locator(state.selector).first()).toBeVisible();
-      await settle(current);
-    }
-    const actual = PNG.sync.read(await page.locator(state.selector).first().screenshot({ path: testInfo.outputPath('angular.png'), animations: 'disabled' }));
-    const expected = PNG.sync.read(await original.locator(state.selector).first().screenshot({ path: testInfo.outputPath('original.png'), animations: 'disabled' }));
-    expect({ width: actual.width, height: actual.height }).toEqual({ width: expected.width, height: expected.height });
-    const difference = new PNG({ width: actual.width, height: actual.height });
-    const changed = pixelmatch(actual.data, expected.data, difference.data, actual.width, actual.height, { threshold: 0.15 });
-    writeFileSync(testInfo.outputPath('difference.png'), PNG.sync.write(difference));
-    expect(changed / (actual.width * actual.height)).toBeLessThan(0.002);
-    await original.close();
+  test(`expanded state: ${state.name}`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.goto(appPath(state.path), { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('header')).toBeVisible();
+    for (const selector of state.clicks) await page.locator(selector).first().click();
+    await expect(page.locator(state.selector).first()).toBeVisible();
+    expect(errors).toEqual([]);
   });
 }
+
+test('the back-to-top button appears once the page is scrolled and returns to the top', async ({ page }) => {
+  await page.goto('/english/home', { waitUntil: 'domcontentloaded' });
+  const button = page.locator('.back-to-top');
+  await expect(button).toBeHidden();
+  await page.locator('footer').scrollIntoViewIfNeeded();
+  await expect(button).toBeVisible();
+  await expect(button).toHaveAttribute('aria-label', 'Back to top');
+  await button.click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(button).toBeHidden();
+  await expect(page.locator('#main-content')).toBeFocused();
+});
+
+test('content rises into place when it is scrolled into view', async ({ page }) => {
+  await page.goto('/english/home', { waitUntil: 'domcontentloaded' });
+  const card = page.locator('main .card').last();
+  const opacity = () => card.evaluate(element => getComputedStyle(element).opacity);
+  await expect.poll(opacity).toBe('0');
+  await card.scrollIntoViewIfNeeded();
+  await expect.poll(opacity).toBe('1');
+});
 
 test('navigation survives route changes, back, and refresh', async ({ page }) => {
   await page.goto('/english/home', { waitUntil: 'domcontentloaded' });
@@ -596,16 +589,21 @@ test('the About menu works with the space bar', async ({ page }) => {
   await page.goto('/english/home', { waitUntil: 'domcontentloaded' });
   await page.locator('.menu-toggle').click();
   const toggle = page.locator('.dropdown-toggle').first();
+  // The closed drawer is hidden from keyboard users, so wait for it to open before focusing.
+  await expect(toggle).toBeVisible();
   await toggle.focus();
+  await expect(toggle).toBeFocused();
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await page.keyboard.press('Space');
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
 });
 
-test('reduced-motion preference stops looping animations', async ({ page }) => {
+test('reduced-motion preference stops looping animations and shows all content at once', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/english/home', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('.site-name').first()).toHaveCSS('animation-iteration-count', '1');
+  await expect(page.locator('main .card').last()).toHaveCSS('opacity', '1');
+  await expect(page.locator('main .card').last()).toHaveCSS('transform', 'none');
 });
 
 test('pages publish a description, canonical URL and language alternates', async ({ page, baseURL }) => {
