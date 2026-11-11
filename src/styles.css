@@ -73,11 +73,12 @@ app-root {
   display: block;
 }
 
+/* Dark until a page stylesheet sets its own background, so the screen never flashes light before the splash or a page appears. */
 body {
   margin: 0;
   font-family: var(--font-body);
   color: var(--text);
-  background: var(--cream);
+  background: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

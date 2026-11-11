@@ -69,7 +69,7 @@ export class PageContext {
   private apply({ route, links }: PreparedPage): void {
     this.prepared.clear();
     for (const link of this.pageLinks()) {
-      if (links.includes(link)) link.removeAttribute('media');
+      if (links.includes(link)) this.enable(link);
       else link.remove();
     }
     this.language.set(route.data['language'] ?? 'en');
@@ -82,6 +82,17 @@ export class PageContext {
     this.appRef.tick();
   }
 
+  private enable(link: HTMLLinkElement): void {
+    const sheet = link.sheet;
+    if (!sheet) {
+      link.removeAttribute('media');
+      return;
+    }
+    // Changing the media attribute makes older Chromium-based browsers (such as many Android phones) download the stylesheet again and
+    // show the page unstyled until it arrives, so the loaded sheet's own media list is cleared instead. The attribute keeps saying "print".
+    if (sheet.media.length) sheet.media.mediaText = '';
+  }
+
   private pageLinks(): HTMLLinkElement[] {
     return Array.from(this.document.querySelectorAll<HTMLLinkElement>('link[data-page-style]'));
   }
@@ -90,7 +101,7 @@ export class PageContext {
     const link = this.document.createElement('link');
     link.rel = 'stylesheet';
     link.href = url;
-    // A non-matching media type downloads the stylesheet without applying it; apply() switches it on when the page swaps in.
+    // A non-matching media type downloads the stylesheet without applying it; enable() switches it on when the page swaps in.
     // Such downloads default to the lowest priority, which would delay navigation, so it is raised explicitly.
     link.media = 'print';
     link.fetchPriority = 'high';

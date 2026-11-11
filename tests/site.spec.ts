@@ -216,6 +216,47 @@ test('navigation survives route changes, back, and refresh', async ({ page }) =>
   await expect(page.locator('link[data-page-style]')).toHaveCount(1);
 });
 
+test('page styles switch on without changing their media attribute', async ({ page }) => {
+  // Older Chromium-based browsers download a stylesheet again when its media attribute changes and show the page unstyled meanwhile.
+  await page.addInitScript(() => {
+    const changed: string[] = [];
+    Object.assign(window, { pageStyleMediaChanges: changed });
+    new MutationObserver(records => {
+      for (const { target } of records) {
+        if (target instanceof HTMLLinkElement && target.matches('[data-page-style]')) changed.push(target.getAttribute('href') ?? '');
+      }
+    }).observe(document, { subtree: true, attributeFilter: ['media'] });
+  });
+  const body = page.locator('body');
+  const cream = 'rgb(251, 248, 241)';
+  await page.goto('/language', { waitUntil: 'domcontentloaded' });
+  await expect(body).toHaveCSS('background-image', /radial-gradient/);
+  await page.locator('a[href="/english/home"]').click();
+  await expect(page).toHaveURL(/\/english\/home$/);
+  await expect(body).toHaveCSS('background-color', cream);
+  await expect(page.locator('header')).toHaveCSS('position', 'fixed');
+  await page.locator('.hero-buttons a[title="Change Language"]').click();
+  await expect(page).toHaveURL(/\/language$/);
+  await expect(body).toHaveCSS('background-image', /radial-gradient/);
+  await page.locator('a[href="/telugu/home"]').click();
+  await expect(page).toHaveURL(/\/telugu\/home$/);
+  await expect(body).toHaveCSS('background-color', cream);
+  expect(await page.evaluate(() => (window as unknown as { pageStyleMediaChanges: string[] }).pageStyleMediaChanges)).toEqual([]);
+});
+
+test('the screen stays dark while the first page styles load', async ({ page }) => {
+  let release!: () => void;
+  const held = new Promise<void>(resolve => release = resolve);
+  await page.route('**/index.css', async route => {
+    await held;
+    await route.continue();
+  });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(11, 16, 38)');
+  release();
+  await expect(page.locator('.loading-text')).toBeVisible();
+});
+
 test('original .html URLs redirect to clean URLs and keep the query and fragment', async ({ page }) => {
   for (const [legacy, clean] of Object.entries(legacyPageUrls)) {
     await page.goto(`/${legacy}?ref=old#contact`, { waitUntil: 'domcontentloaded' });
