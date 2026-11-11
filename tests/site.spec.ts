@@ -87,6 +87,16 @@ async function settle(page: Page): Promise<void> {
   });
 }
 
+// Wide screens show the menu in the header bar; smaller ones open it with the menu button.
+async function openNavigation(page: Page): Promise<void> {
+  await expect(page.locator('header')).toHaveCSS('position', 'fixed');
+  const toggle = page.locator('.menu-toggle');
+  if (await toggle.isVisible()) {
+    await toggle.click();
+    await expect(page.locator('.main-nav')).toHaveClass(/active/);
+  }
+}
+
 async function contentText(page: Page): Promise<string> {
   return page.evaluate(() => {
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -157,7 +167,7 @@ test('splash leads to language selection', async ({ page }) => {
 });
 
 for (const state of [
-  { name: 'navigation', path: 'English/home-english.html', clicks: ['.menu-toggle', '.dropdown-toggle'], selector: '.main-nav' },
+  { name: 'navigation', path: 'English/home-english.html', open: openNavigation, clicks: ['.dropdown-toggle'], selector: '.main-nav .dropdown-menu a' },
   { name: 'book chapter', path: 'English/books-english.html', clicks: ['.read-btn'], selector: '.reader-content' },
   { name: 'founder chapter', path: 'English/chosen-english.html', clicks: ['.chapter-header'], selector: '.chapter.active' },
   { name: 'video card', path: 'English/videos-english.html', clicks: ['.songs-section .section-header'], selector: '.songs-section .video-card' },
@@ -169,6 +179,7 @@ for (const state of [
     page.on('pageerror', error => errors.push(error.message));
     await page.goto(appPath(state.path), { waitUntil: 'domcontentloaded' });
     await expect(page.locator('header')).toBeVisible();
+    await state.open?.(page);
     for (const selector of state.clicks) await page.locator(selector).first().click();
     await expect(page.locator(state.selector).first()).toBeVisible();
     expect(errors).toEqual([]);
@@ -199,8 +210,7 @@ test('content rises into place when it is scrolled into view', async ({ page }) 
 
 test('navigation survives route changes, back, and refresh', async ({ page }) => {
   await page.goto('/english/home', { waitUntil: 'domcontentloaded' });
-  await page.locator('.menu-toggle').click();
-  await expect(page.locator('.main-nav')).toHaveClass(/active/);
+  await openNavigation(page);
   await page.locator('.main-nav a[href="/english/books"]').click();
   await expect(page).toHaveTitle('Books - Holy Army Fellowship');
   await expect(page.locator('.main-nav')).not.toHaveClass(/active/);
@@ -214,6 +224,53 @@ test('navigation survives route changes, back, and refresh', async ({ page }) =>
   await page.locator('.hero-buttons a[title="Change Language"]').click();
   await expect(page).toHaveURL(/\/language$/, { timeout: 1500 });
   await expect(page.locator('link[data-page-style]')).toHaveCount(1);
+});
+
+test('the header fills its bar in both languages', async ({ page, isMobile }) => {
+  // On laptops the whole menu sits in the bar, including the narrowest width that shows it.
+  const sizes = isMobile ? [page.viewportSize()!] : [{ width: 1024, height: 768 }, page.viewportSize()!];
+  for (const size of sizes) for (const path of ['/english/home', '/telugu/home', '/telugu/books']) {
+    const wide = size.width >= 1024;
+    const where = `${path} at ${size.width}px`;
+    await page.setViewportSize(size);
+    await page.goto(path, { waitUntil: 'domcontentloaded' });
+    await expect(page.locator('header')).toHaveCSS('position', 'fixed');
+    await expect(page.locator('header .menu-toggle')).toBeVisible({ visible: !wide });
+    await expect(page.locator('.main-nav .nav-home')).toBeVisible({ visible: wide });
+    const layout = await page.evaluate(async () => {
+      await document.fonts.ready;
+      const nameElement = document.querySelector('header .site-name')!;
+      const name = document.createRange();
+      name.selectNodeContents(nameElement);
+      const links = Array.from(document.querySelectorAll('.main-nav :is(.nav-links > a, .dropdown-toggle)'), link => link.getBoundingClientRect());
+      return {
+        viewport: innerWidth,
+        pageWidth: document.documentElement.scrollWidth,
+        header: document.querySelector('header')!.getBoundingClientRect().height,
+        name: name.getBoundingClientRect().toJSON() as DOMRect,
+        nameLines: Math.round(nameElement.getBoundingClientRect().height / parseFloat(getComputedStyle(nameElement).lineHeight)),
+        toggle: document.querySelector('header .menu-toggle')!.getBoundingClientRect().left,
+        links: links.map(link => link.toJSON() as DOMRect)
+      };
+    });
+    expect(layout.pageWidth, where).toBeLessThanOrEqual(layout.viewport);
+    if (wide) {
+      // Every menu entry sits on one line in the bar, clear of the brand.
+      const heights = layout.links.map(link => link.height);
+      expect(layout.links, where).toHaveLength(7);
+      expect(Math.max(...heights) - Math.min(...heights), where).toBeLessThan(2);
+      expect(layout.links[0].left, where).toBeGreaterThan(layout.name.right + 16);
+      expect(layout.links.at(-1)!.right, where).toBeLessThanOrEqual(layout.viewport);
+      for (const link of layout.links) {
+        expect(link.top, where).toBeGreaterThan(0);
+        expect(link.bottom, where).toBeLessThan(layout.header);
+      }
+    } else if (path.startsWith('/telugu')) {
+      // The short Telugu name grows to use the room beside the menu button.
+      expect(layout.nameLines, where).toBe(1);
+      expect((layout.name.right - layout.name.left) / (layout.toggle - layout.name.left), where).toBeGreaterThan(0.75);
+    }
+  }
 });
 
 test('page styles switch on without changing their media attribute', async ({ page }) => {
@@ -628,9 +685,9 @@ test('photos and book PDFs are served by the site itself', async ({ page, reques
 
 test('the About menu works with the space bar', async ({ page }) => {
   await page.goto('/english/home', { waitUntil: 'domcontentloaded' });
-  await page.locator('.menu-toggle').click();
+  await openNavigation(page);
   const toggle = page.locator('.dropdown-toggle').first();
-  // The closed drawer is hidden from keyboard users, so wait for it to open before focusing.
+  // On small screens the closed drawer is hidden from keyboard users, so wait for it to open before focusing.
   await expect(toggle).toBeVisible();
   await toggle.focus();
   await expect(toggle).toBeFocused();

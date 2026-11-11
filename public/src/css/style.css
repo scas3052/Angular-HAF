@@ -37,7 +37,7 @@ header {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0 clamp(1rem, 3vw, 2.75rem);
+  padding: 0 var(--header-pad);
   background: rgba(11, 16, 38, 0.72);
   -webkit-backdrop-filter: blur(16px) saturate(150%);
   backdrop-filter: blur(16px) saturate(150%);
@@ -402,6 +402,213 @@ header.transparent::after {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
+}
+
+/* ---------- Wide screens: the menu sits in the header bar ---------- */
+
+@keyframes haf-menu-item {
+  from { opacity: 0; transform: translateY(-8px); }
+}
+
+/* The nav stays a sibling of the header (the header's backdrop filter would trap the fixed drawer),
+   so on wide screens it is laid over the right-hand end of the header bar instead of sliding in. */
+@media (min-width: 1024px) {
+  .site-name {
+    font-size: clamp(1.15rem, 1.6vw, 1.6rem);
+    letter-spacing: 0.1em;
+  }
+
+  .menu-toggle,
+  .nav-backdrop {
+    display: none;
+  }
+
+  .main-nav,
+  .main-nav.active {
+    --nav-x: clamp(0.6rem, 1vw, 1.1rem);
+    top: 0;
+    right: var(--header-pad);
+    bottom: auto;
+    width: auto;
+    height: var(--header-h);
+    flex-direction: row;
+    overflow: visible;
+    background: none;
+    border: 0;
+    box-shadow: none;
+    transform: none;
+    visibility: visible;
+    transition: none;
+  }
+
+  header:has(.language-select) ~ .main-nav {
+    right: calc(var(--header-pad) + 46px + 1rem);
+  }
+
+  .nav-container {
+    flex: none;
+    display: flex;
+  }
+
+  .nav-links {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0;
+  }
+
+  .main-nav .dropdown {
+    position: relative;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+  }
+
+  .main-nav .nav-links > a,
+  .main-nav .dropdown-toggle {
+    gap: 0.4rem;
+    padding: 0.55rem var(--nav-x);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  html:is([lang='te'], [lang='hi'], [lang='ta']) .main-nav :is(.nav-links > a, .dropdown-toggle) {
+    font-size: 1rem;
+  }
+
+  .main-nav .nav-links > a > i,
+  .main-nav .dropdown-toggle > i:not(.fa-chevron-down) {
+    display: none;
+  }
+
+  .main-nav .dropdown-toggle .fa-chevron-down {
+    margin-left: 0;
+    font-size: 0.6rem;
+    transition: transform 0.45s var(--ease-spring);
+  }
+
+  .main-nav .dropdown.active .fa-chevron-down {
+    transform: rotate(180deg);
+  }
+
+  /* The drawer's side bar becomes an underline that grows from the middle. */
+  .main-nav .nav-links > a::after,
+  .main-nav .dropdown-toggle::after {
+    left: var(--nav-x);
+    right: var(--nav-x);
+    top: auto;
+    bottom: 0.3rem;
+    width: auto;
+    height: 2px;
+    transform: scaleX(0);
+  }
+
+  .main-nav .nav-links > a.active {
+    background: none;
+    text-shadow: 0 0 18px rgba(245, 196, 81, 0.45);
+  }
+
+  .main-nav .nav-links > a.active::after {
+    transform: scaleX(1);
+  }
+
+  .main-nav .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    width: max-content;
+    min-width: 15rem;
+    margin: 0;
+    padding: 0.5rem;
+    max-height: none;
+    overflow: visible;
+    border: 1px solid rgba(245, 196, 81, 0.22);
+    border-radius: var(--radius-sm);
+    background:
+      radial-gradient(120% 90% at 100% 0%, rgba(75, 47, 122, 0.5), transparent 60%),
+      linear-gradient(180deg, #131b45, #0b1026);
+    box-shadow: 0 26px 50px -18px rgba(0, 0, 0, 0.7);
+    transform: translate(-50%, 10px) scale(0.97);
+    transform-origin: 50% 0;
+    transition: opacity 0.3s var(--ease-out), transform 0.45s var(--ease-spring), visibility 0s linear 0.45s;
+  }
+
+  /* Keeps the menu open while the pointer crosses the gap below the header. */
+  .main-nav .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 12px;
+  }
+
+  .main-nav .dropdown.active .dropdown-menu {
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  .main-nav .dropdown-menu a {
+    white-space: nowrap;
+  }
+
+  .main-nav .dropdown:has(.dropdown-menu a.active) > .dropdown-toggle {
+    color: var(--gold);
+  }
+
+  .main-nav .dropdown:has(.dropdown-menu a.active) > .dropdown-toggle::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Until there is room for it on one line, the long English name stacks beside the menu. */
+@media (min-width: 1024px) and (max-width: 1199.98px) {
+  html[lang='en'] .site-name {
+    width: min-content;
+  }
+}
+
+@media (min-width: 1024px) and (hover: hover) {
+  .main-nav .nav-links > a:hover,
+  .main-nav .dropdown-toggle:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-1px);
+  }
+
+  .main-nav .nav-links > a:hover::after,
+  .main-nav .dropdown-toggle:hover::after {
+    transform: scaleX(1);
+  }
+
+  .main-nav .dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0) scale(1);
+    transition-delay: 0s;
+  }
+
+  .main-nav .dropdown:hover .fa-chevron-down {
+    transform: rotate(180deg);
+  }
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .main-nav .dropdown.active .dropdown-menu a {
+    animation: haf-menu-item 0.45s var(--ease-out) backwards;
+  }
+
+  .main-nav .dropdown.active .dropdown-menu a:nth-child(2) { animation-delay: 0.06s; }
+  .main-nav .dropdown.active .dropdown-menu a:nth-child(3) { animation-delay: 0.12s; }
+}
+
+@media (min-width: 1024px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .main-nav .dropdown:hover .dropdown-menu a {
+    animation: haf-menu-item 0.45s var(--ease-out) backwards;
+  }
+
+  .main-nav .dropdown:hover .dropdown-menu a:nth-child(2) { animation-delay: 0.06s; }
+  .main-nav .dropdown:hover .dropdown-menu a:nth-child(3) { animation-delay: 0.12s; }
 }
 
 /* ---------- Cinematic heroes (home and every content page) ---------- */
@@ -862,12 +1069,21 @@ header.transparent::after {
 
 /* ---------- Scripts without Latin capitals read better without tracking ---------- */
 
+/* The Telugu name is much shorter than the English one, so on phones it grows with the screen
+   to fill the space beside the menu button (about 150px goes to the padding, logo and button). */
 html:is([lang='te'], [lang='hi'], [lang='ta']) .site-name {
-  font-size: clamp(1rem, 1vw + 0.7rem, 1.4rem);
+  font-size: clamp(1.1rem, (100vw - 150px) * 0.092, 1.6rem);
   font-weight: 700;
   line-height: 1.5;
   letter-spacing: 0.02em;
   text-transform: none;
+}
+
+/* Beside the full menu on wide screens it can grow further and still leave the menu room. */
+@media (min-width: 1024px) {
+  html:is([lang='te'], [lang='hi'], [lang='ta']) .site-name {
+    font-size: clamp(1.6rem, 0.8rem + 1.1vw, 2rem);
+  }
 }
 
 html:is([lang='te'], [lang='hi'], [lang='ta']) :where(.hero-content, .books-hero-content, .faith-hero-content, .gallery-hero-content, .origin-hero-content, .testimonies-hero-content, .videos-hero-content) > h1 {
@@ -917,10 +1133,6 @@ html:is([lang='te'], [lang='hi'], [lang='ta']) :is(.nav-links a, .cta-button) {
   .site-name {
     font-size: 0.98rem;
     letter-spacing: 0.06em;
-  }
-
-  html:is([lang='te'], [lang='hi'], [lang='ta']) .site-name {
-    font-size: 0.98rem;
   }
 
   .card {

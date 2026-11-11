@@ -35,6 +35,8 @@
   --font-body: 'Playfair Display', 'Noto Serif Telugu', Georgia, 'Times New Roman', serif;
 
   --header-h: 84px;
+  /* Side padding of the fixed header; on very wide screens it also keeps the header's contents within 1400px. */
+  --header-pad: max(clamp(1rem, 3vw, 2.75rem), (100% - 1400px) / 2);
   --radius: 22px;
   --radius-sm: 14px;
   --shadow-sm: 0 4px 14px rgba(11, 16, 38, 0.08);

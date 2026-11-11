@@ -22,14 +22,24 @@ export class SiteHeader {
 
   constructor() {
     effect(() => {
-      this.dropdownOpen.set(['origin', 'faith', 'chosen'].includes(this.context.kind()));
-      this.menuOpen.set(false);
+      this.context.kind();
+      this.closeMenu();
     });
   }
 
   updateScroll(): void { this.transparent.set(window.scrollY > 100); }
-  toggleMenu(): void { this.menuOpen.update(open => !open); }
-  closeMenu(): void { this.menuOpen.set(false); }
+
+  toggleMenu(): void {
+    const open = !this.menuOpen();
+    this.menuOpen.set(open);
+    // The drawer opens with "About" expanded on its own pages; on wide screens the panel only opens on demand.
+    this.dropdownOpen.set(open && ['origin', 'faith', 'chosen'].includes(this.context.kind()));
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+    this.dropdownOpen.set(false);
+  }
 
   toggleDropdown(event: Event): void {
     event.preventDefault();
