@@ -157,13 +157,18 @@ for (const entry of pages) {
   });
 }
 
-test('splash leads to language selection', async ({ page }) => {
+test('splash leads to language selection on every visit', async ({ page }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('.loading-text')).toHaveText('Welcome to HOLY ARMY FELLOWSHIP');
   await expect(page).toHaveURL(/\/language$/);
   await page.locator('a[href="/telugu/home"]').click();
   await expect(page).toHaveURL(/\/telugu\/home$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'te');
+  // The choice is not remembered: opening the site again (same browser storage) shows the splash and the language choice again.
+  const reopened = await page.context().newPage();
+  await reopened.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(reopened.locator('.loading-text')).toBeVisible();
+  await expect(reopened).toHaveURL(/\/language$/);
 });
 
 for (const state of [

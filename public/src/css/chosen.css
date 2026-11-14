@@ -1056,3 +1056,30 @@ html[lang='te'] .chapter-text p {
     color: var(--gold-deep);
   }
 }
+
+/* ---------- Depth in the opening scene ---------- */
+
+/* With a mouse, the stars, the aurora, the portrait and the words drift at different depths as the pointer moves
+   (--hx and --hy are set on .about by core/effects.ts), and the stars twinkle. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .about::before {
+    translate: calc(var(--hx, 0) * -12px) calc(var(--hy, 0) * -10px);
+    transition: translate 1.6s var(--ease-out);
+    animation: haf-twinkle-soft 4.5s ease-in-out infinite alternate;
+  }
+
+  .about::after {
+    translate: calc(var(--hx, 0) * 36px) calc(var(--hy, 0) * 26px);
+    transition: translate 2.2s var(--ease-out);
+  }
+
+  .about .image-container {
+    translate: calc(var(--hx, 0) * -20px) calc(var(--hy, 0) * -14px);
+    transition: translate 1.2s var(--ease-out);
+  }
+
+  .about-text {
+    translate: calc(var(--hx, 0) * 10px) calc(var(--hy, 0) * 8px);
+    transition: translate 1.5s var(--ease-out);
+  }
+}

@@ -396,7 +396,19 @@ html[lang='te'] .filter-btn {
     0 0 90px -20px rgba(245, 196, 81, 0.35),
     0 40px 90px -30px rgba(0, 0, 0, 0.9);
   cursor: auto;
-  animation: haf-zoom-in 0.6s var(--ease-out) 0.05s backwards;
+  animation: gallery-photo-out 0.75s cubic-bezier(0.25, 0.85, 0.3, 1) 0.05s backwards;
+}
+
+/* The opened photo flies out of its thumbnail to the centre (--from-x/--from-y are set by GalleryState.open). */
+@keyframes gallery-photo-out {
+  from {
+    opacity: 0;
+    transform: translate(var(--from-x, 0px), var(--from-y, 0px)) scale(0.28);
+  }
+
+  45% {
+    opacity: 1;
+  }
 }
 
 .close-lightbox,

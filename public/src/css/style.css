@@ -1139,3 +1139,167 @@ html:is([lang='te'], [lang='hi'], [lang='ta']) :is(.nav-links a, .cta-button) {
     padding: 2rem 1.4rem 1.75rem;
   }
 }
+
+/* ---------- Living heroes: light rays, depth with the pointer, and a gentle exit on scroll ---------- */
+
+/* Rays of light fan out behind each hero's words (from the emblem on the home page). */
+:where(.hero-content, .books-hero-content, .faith-hero-content, .gallery-hero-content, .origin-hero-content, .testimonies-hero-content, .videos-hero-content)::before {
+  content: '';
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  z-index: -1;
+  width: min(1300px, 180vw);
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 236, 180, 0.12) 0deg 3.5deg, transparent 3.5deg 15deg);
+  -webkit-mask-image: radial-gradient(closest-side, #000 8%, rgba(0, 0, 0, 0.45) 40%, transparent 72%);
+  mask-image: radial-gradient(closest-side, #000 8%, rgba(0, 0, 0, 0.45) 40%, transparent 72%);
+  transform: translate(-50%, -50%);
+  animation: haf-fade-in 2.4s var(--ease-out) 0.4s both;
+}
+
+.hero-content::before {
+  top: 14%;
+}
+
+@keyframes haf-rays {
+  to { transform: translate(-50%, -50%) rotate(1turn); }
+}
+
+/* With a mouse, the rays turn, the stars twinkle and each layer drifts at its own depth as the pointer moves
+   (--hx and --hy run from -1 to 1 across the window and are set by core/effects.ts). Touch screens keep a still sky. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  :where(.hero-content, .books-hero-content, .faith-hero-content, .gallery-hero-content, .origin-hero-content, .testimonies-hero-content, .videos-hero-content)::before {
+    translate: calc(var(--hx, 0) * -30px) calc(var(--hy, 0) * -22px);
+    transition: translate 1.8s var(--ease-out);
+    animation: haf-fade-in 2.4s var(--ease-out) 0.4s both, haf-rays 140s linear infinite;
+  }
+
+  :where(.hero, .books-hero, .faith-hero, .gallery-hero, .origin-hero, .testimonies-hero, .videos-hero)::before {
+    translate: calc(var(--hx, 0) * -12px) calc(var(--hy, 0) * -10px);
+    transition: translate 1.6s var(--ease-out);
+    animation: haf-twinkle-soft 4.5s ease-in-out infinite alternate;
+  }
+
+  :where(.hero, .books-hero, .faith-hero, .gallery-hero, .origin-hero, .testimonies-hero, .videos-hero)::after {
+    translate: calc(var(--hx, 0) * 36px) calc(var(--hy, 0) * 26px);
+    transition: translate 2.2s var(--ease-out);
+  }
+
+  :where(.hero-content, .books-hero-content, .faith-hero-content, .gallery-hero-content, .origin-hero-content, .testimonies-hero-content, .videos-hero-content) {
+    translate: calc(var(--hx, 0) * 14px) calc(var(--hy, 0) * 10px);
+    transition: translate 1.1s var(--ease-out);
+  }
+
+  .hero-particles {
+    translate: calc(var(--hx, 0) * -44px) calc(var(--hy, 0) * -30px);
+    transition: translate 1.2s var(--ease-out);
+  }
+}
+
+/* As the page scrolls on, a hero's words sink back and fade, slower than the page moves (scroll-driven, where supported). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    :where(.hero, .books-hero, .faith-hero, .gallery-hero, .origin-hero, .testimonies-hero, .videos-hero) {
+      view-timeline: --haf-hero block;
+    }
+
+    :where(.hero-content, .books-hero-content, .faith-hero-content, .gallery-hero-content, .origin-hero-content, .testimonies-hero-content, .videos-hero-content) {
+      animation: haf-hero-exit linear both;
+      animation-timeline: --haf-hero;
+      animation-range: exit 0% exit 85%;
+    }
+
+    .hero-scroll {
+      animation: haf-fade-in 1s ease 1.4s both, haf-fade-out linear both;
+      animation-timeline: auto, --haf-hero;
+      animation-range: normal, exit 0% exit 22%;
+    }
+  }
+}
+
+@keyframes haf-hero-exit {
+  to { opacity: 0; transform: translateY(16vh) scale(0.94); }
+}
+
+/* The main invitation glows softly, now and then, to draw the eye. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-buttons .cta-button:first-child {
+    animation: haf-cta-glow 3.6s ease-in-out 2.4s infinite;
+  }
+}
+
+@media (hover: hover) {
+  .hero-buttons .cta-button:first-child:hover {
+    animation: none;
+  }
+}
+
+@keyframes haf-cta-glow {
+  0%, 100% { box-shadow: var(--shadow-gold); }
+  50% { box-shadow: 0 0 0 7px rgba(245, 196, 81, 0.16), 0 0 34px 4px rgba(245, 196, 81, 0.55), var(--shadow-gold); }
+}
+
+/* ---------- Home sections: drifting light, and cards ringed with turning gold ---------- */
+
+.section {
+  isolation: isolate;
+  overflow: clip;
+}
+
+.section::before,
+.section::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: clamp(240px, 34vw, 480px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.section::before {
+  top: -10%;
+  left: -8%;
+  background: radial-gradient(circle, rgba(245, 196, 81, 0.2), rgba(245, 196, 81, 0) 68%);
+}
+
+.section::after {
+  right: -8%;
+  bottom: -12%;
+  background: radial-gradient(circle, rgba(75, 47, 122, 0.13), rgba(75, 47, 122, 0) 68%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .section::before {
+    animation: haf-drift 24s ease-in-out infinite alternate;
+  }
+
+  .section::after {
+    animation: haf-drift 30s ease-in-out -11s infinite alternate-reverse;
+  }
+}
+
+/* A thread of gold light runs round a card while it is pointed at. */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(from var(--haf-angle), transparent 0% 60%, rgba(245, 196, 81, 0.3) 70%, var(--gold) 80%, var(--gold-soft) 84%, transparent 93%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover::before {
+    opacity: 1;
+    animation: haf-angle-turn 2.8s linear infinite;
+  }
+}

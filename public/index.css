@@ -494,3 +494,34 @@ body {
     align-self: start;
   }
 }
+
+/* ---------- Depth in the night sky ---------- */
+
+/* The sparks get a box of their own, the size of the sky, so they still rise from its foot when the layer is moved below. */
+.entry-sparks {
+  position: absolute;
+  inset: 0;
+}
+
+/* With a mouse, the aurora, the two star fields and the rising sparks drift at different depths as the pointer moves
+   (--hx and --hy are set on .entry-sky by core/effects.ts). */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .entry-sky::before {
+    translate: calc(var(--hx, 0) * 34px) calc(var(--hy, 0) * 26px);
+    transition: translate 2.2s var(--ease-out);
+  }
+
+  .entry-stars {
+    translate: calc(var(--hx, 0) * -10px) calc(var(--hy, 0) * -8px);
+    transition: translate 1.8s var(--ease-out);
+  }
+
+  .entry-stars + .entry-stars {
+    translate: calc(var(--hx, 0) * -22px) calc(var(--hy, 0) * -16px);
+  }
+
+  .entry-sparks {
+    translate: calc(var(--hx, 0) * -46px) calc(var(--hy, 0) * -32px);
+    transition: translate 1.2s var(--ease-out);
+  }
+}

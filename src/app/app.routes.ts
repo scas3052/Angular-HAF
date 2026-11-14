@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { Route, Router, Routes } from '@angular/router';
 import { contentRoutes } from './content.routes';
-import { preparePage, savedLanguageHome } from './core/page-context';
+import { preparePage } from './core/page-context';
 import { legacyPageUrls } from './page-urls';
 import { LanguagePage, LoadingPage } from './pages/entry';
 
@@ -14,12 +14,8 @@ const legacyRedirects: Routes = Object.entries(legacyPageUrls).map(([legacy, pat
 export const routes: Routes = [
 	...contentRoutes,
 	{
+		// Every visit starts with the splash and then the language choice; the last language used is not remembered.
 		path: '', pathMatch: 'full', component: LoadingPage,
-		// Returning visitors skip the splash and language choice and go straight to the home page they last used.
-		canActivate: [() => {
-			const home = savedLanguageHome();
-			return home ? inject(Router).parseUrl(home) : true;
-		}],
 		title: 'Holy Army Fellowship - Loading',
 		resolve: { appearance: preparePage },
 		data: { kind: 'loading', styles: ['/src/css/style.css', '/index.css'] }

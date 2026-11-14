@@ -12,7 +12,7 @@ npm.cmd ci
 npm.cmd start -- --port 4201
 ```
 
-Open http://localhost:4201. The animated loading screen leads to language selection. Pages use clean URLs without file names, such as `/english/home` and `/telugu/gallery`. Existing links such as `/English/home-english.html` still work: they redirect to the clean URL and keep any query string or `#fragment`.
+Open http://localhost:4201. Every visit starts with the animated loading screen, which leads to language selection; the language chosen last time is not remembered. Pages use clean URLs without file names, such as `/english/home` and `/telugu/gallery`. Existing links such as `/English/home-english.html` still work: they redirect to the clean URL and keep any query string or `#fragment`.
 
 To use the local CLI, run `npm.cmd run ng -- version` or `npm.cmd run ng -- generate component components/example`.
 
@@ -34,10 +34,13 @@ Interactive features use Angular signals, bindings, directives, and forms. Video
 
 The site uses a "midnight and gold" design: dark animated heroes, header, navigation drawer and footer, with light, readable content sections. Colours, fonts and shadows are CSS variables in `src/styles.css`, which also holds the shared animations.
 
-- Pages cross-fade into each other with the browser's View Transitions API (Chrome, Edge and Safari 18+; other browsers change pages instantly). Following an in-page link such as `#contact` scrolls smoothly instead.
-- Headings, cards, books, photos, videos and chapters rise into view as the visitor scrolls, one after another. Cards tilt slightly towards the mouse pointer.
-- A gold bar at the top shows how far down the page the visitor has read, and a back-to-top button appears after scrolling.
-- When the visitor's system asks for reduced motion, looping and scroll animations are switched off and all content is shown at once. Animations are also turned off for printing.
+- Pages change with the browser's View Transitions API (Chrome, Edge and Safari 18+; other browsers change pages instantly). A page opened from a link spreads out from that link as a widening circle of light; Back and Forward cross-fade. Following an in-page link such as `#contact` scrolls smoothly instead.
+- Content arrives as the visitor scrolls, each kind in its own way (`src/app/core/motion.ts`): section titles rise out of a slot and draw their gold underline, cards stand up from lying back, books swing open on their spines, photos drop in and (with a mouse) develop from pale to full colour, beliefs glide in from alternate sides, and the footer cascades in. Icons spin into place just after their block. Cards tilt slightly towards the mouse pointer.
+- Every hero has slowly turning rays of light behind its words; with a mouse, its stars twinkle and its layers (aurora, stars, sparks, words) drift at different depths as the pointer moves. As the page scrolls on, the hero's words sink back and fade (scroll-driven animation, where the browser supports it). The founder banner and the language page's night sky have the same depth.
+- A gold halo trails the mouse and opens up over anything that can be pressed; the main buttons lean towards the pointer. Every press, by mouse, touch or keyboard, sends out a small burst of gold sparks, and a sent prayer request is celebrated with sparks and confetti (`src/app/core/effects.ts`). These decorations are never focusable and never in the way of a click.
+- Shuffled testimonies and videos, and gallery photos after a filter, glide to their new places. An opened photo flies out of its thumbnail, and the next and previous photos slide in from that side. Book chapters turn like pages.
+- A gold bar at the top shows how far down the page the visitor has read, and the back-to-top button that appears after scrolling fills a matching gold ring.
+- When the visitor's system asks for reduced motion, looping, scroll and pointer animations are switched off and all content is shown at once. Animations are also turned off for printing. On touch screens the hero sky stays still, so scrolling stays smooth on phones.
 
 ## Build And Test
 

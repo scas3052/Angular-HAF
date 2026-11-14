@@ -1,22 +1,29 @@
-import { Component, Directive, ElementRef, computed, inject, input, signal, viewChild } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { Component, Directive, ElementRef, Injector, afterNextRender, computed, inject, input, signal, viewChild } from '@angular/core';
+import { glide, layoutOf } from '../core/flip';
 import { PageContext } from '../core/page-context';
 
 export interface TestimonyStory { id: number; name: string; role: string; button: string; content: string; }
 
 @Directive()
 export class TestimoniesState {
+  private readonly document = inject(DOCUMENT);
+  private readonly injector = inject(Injector);
   readonly search = signal('');
   readonly stories = signal<TestimonyStory[]>([]);
   readonly hasResults = computed(() => this.stories().some(story => this.matches(story)));
   matches(story: TestimonyStory): boolean { return story.name.toLowerCase().includes(this.search().toLowerCase()); }
 
   shuffle(): void {
+    // The cards glide to their new places rather than jumping there.
+    const before = layoutOf(this.document.querySelectorAll<HTMLElement>('.testimony-card'));
     const stories = [...this.stories()];
     for (let index = stories.length - 1; index > 0; index--) {
       const randomIndex = Math.floor(Math.random() * (index + 1));
       [stories[index], stories[randomIndex]] = [stories[randomIndex], stories[index]];
     }
     this.stories.set(stories);
+    afterNextRender(() => glide(before), { injector: this.injector });
   }
 }
 

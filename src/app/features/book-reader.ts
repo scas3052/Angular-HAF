@@ -87,6 +87,7 @@ export class BookReader {
   private readonly content = viewChild<ElementRef<HTMLElement>>('content');
   private readonly modal = viewChild.required<ElementRef<HTMLElement>>('modal');
   private readonly closeButton = viewChild.required<ElementRef<HTMLButtonElement>>('closeButton');
+  private shown: { book: string | null; chapter: number } = { book: null, chapter: 0 };
   readonly copy = computed(() => this.context.language() === 'te' ? {
     close: 'పుస్తకాన్ని మూసివేయండి', chapter: 'అధ్యాయం', previous: 'మునుపటి అధ్యాయం', next: 'తదుపరి అధ్యాయం'
   } : {
@@ -103,6 +104,28 @@ export class BookReader {
       // The dialog only becomes visible once this render finishes, so focus is moved after it.
       if (this.reader.bookId()) afterNextRender(() => this.closeButton().nativeElement.focus(), { injector: this.injector });
     });
+    effect(() => {
+      const book = this.reader.bookId();
+      const chapter = this.reader.chapterIndex();
+      const previous = this.shown;
+      this.shown = { book, chapter };
+      // Moving between chapters of the open book turns the page in the direction of travel.
+      if (book && book === previous.book && chapter !== previous.chapter) {
+        const direction = chapter > previous.chapter ? 1 : -1;
+        afterNextRender(() => this.turnPage(direction), { injector: this.injector });
+      }
+    });
+  }
+
+  private turnPage(direction: number): void {
+    const content = this.content()?.nativeElement;
+    const view = content?.ownerDocument.defaultView;
+    if (!content || !view || view.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const hinge = direction > 0 ? '0% 50%' : '100% 50%';
+    content.animate([
+      { opacity: 0, transform: `perspective(1600px) translateX(${direction * 56}px) rotateY(${direction * -14}deg)`, transformOrigin: hinge },
+      { opacity: 1, transform: 'perspective(1600px) translateX(0) rotateY(0deg)', transformOrigin: hinge }
+    ], { duration: 580, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
   }
 
   keepFocusInside(event: KeyboardEvent): void {

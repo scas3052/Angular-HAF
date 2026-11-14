@@ -104,19 +104,11 @@
     0 12px 26px -10px rgba(184, 134, 43, 0.7),
     0 0 0 6px rgba(245, 196, 81, 0.12),
     inset 0 0 0 4px rgba(255, 255, 255, 0.35);
+  /* No entrance of its own: the icon spins into place when its belief scrolls into view (core/motion.ts). */
   transition:
     rotate 0.55s var(--ease-spring),
     scale 0.55s var(--ease-spring),
     box-shadow 0.45s var(--ease-out);
-  animation: haf-pop 0.8s var(--ease-out) 0.4s backwards;
-}
-
-.belief-item:nth-child(3n + 2) .belief-icon {
-  animation-delay: 0.52s;
-}
-
-.belief-item:nth-child(3n) .belief-icon {
-  animation-delay: 0.64s;
 }
 
 /* Dashed halo that starts turning when the card is hovered. */

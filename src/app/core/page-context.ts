@@ -8,22 +8,6 @@ interface PreparedPage {
   links: HTMLLinkElement[];
 }
 
-const languageKey = 'haf-language';
-
-/** The home page of the language the visitor last browsed in, or null on a first visit or when storage is unavailable. */
-export function savedLanguageHome(): string | null {
-  try {
-    const language = localStorage.getItem(languageKey);
-    return language === 'en' ? '/english/home' : language === 'te' ? '/telugu/home' : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveLanguage(language: 'en' | 'te'): void {
-  try { localStorage.setItem(languageKey, language); } catch { /* Storage can be blocked; the choice is simply not remembered. */ }
-}
-
 @Injectable({ providedIn: 'root' })
 export class PageContext {
   private readonly document = inject(DOCUMENT);
@@ -76,7 +60,6 @@ export class PageContext {
     this.kind.set(route.data['kind'] ?? 'loading');
     this.layout.set(route.data['layout'] ?? {});
     this.document.documentElement.lang = this.language();
-    if (route.data['language']) saveLanguage(this.language());
     this.document.body.style.overflow = '';
     // Zoneless change detection is scheduled asynchronously, so without this the browser can paint the new page before its header and navigation render.
     this.appRef.tick();

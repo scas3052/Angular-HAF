@@ -1,5 +1,6 @@
-import { Component, Directive, DestroyRef, ElementRef, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, Directive, DestroyRef, ElementRef, Injector, afterNextRender, computed, effect, inject, input, signal } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { glide, layoutOf } from '../core/flip';
 import { PageContext } from '../core/page-context';
 
 export interface VideoCardData { key: string; id: string | null; category: string; title: string; info: string; }
@@ -22,6 +23,7 @@ export class VideoSection {
   readonly cards = computed(() => this.order() ?? this.section().cards);
   readonly expanded = computed(() => this.catalog.activeSection() === this.section().id);
   private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
   private scrollTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
@@ -51,12 +53,15 @@ export class VideoSection {
 
   shuffle(): void {
     this.catalog.playingKey.set(null);
+    // The videos on screen glide to their new places rather than jumping there.
+    const before = layoutOf(this.element.nativeElement.querySelectorAll<HTMLElement>('.video-card'));
     const cards = [...this.cards()];
     for (let index = cards.length - 1; index > 0; index--) {
       const randomIndex = Math.floor(Math.random() * (index + 1));
       [cards[index], cards[randomIndex]] = [cards[randomIndex], cards[index]];
     }
     this.order.set(cards);
+    afterNextRender(() => glide(before), { injector: this.injector });
   }
 }
 

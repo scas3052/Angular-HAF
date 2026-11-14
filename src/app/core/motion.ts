@@ -1,16 +1,73 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 
-/** Content blocks that rise into place the first time they scroll into view. */
+/** Content blocks that move into place the first time they scroll into view. */
 const revealSelector = [
   '.section-title', '.section-subtitle', '.card', '.book-card', '.gallery-item', '.testimony-card',
-  '.video-section', '.belief-item', '.belief-spotlight', '.verse', '.chapter'
+  '.video-section', '.belief-item', '.belief-spotlight', '.verse', '.chapter', '.footer-section'
 ].join(', ');
 /** The header, menu and dialogs must appear at once, and the timeline animates itself. */
 const staticSelector = 'header, nav, .lightbox, .reader-modal, .timeline';
 const tiltSelector = '.card, .book-card';
-const revealFrames: Keyframe[] = [{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'none' }];
-const revealTiming: KeyframeAnimationOptions = { duration: 700, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)', fill: 'backwards' };
+/** Icons that spin into place just after the block holding them arrives. */
+const iconSelector = ':scope > i, .belief-icon, .belief-spotlight-icon, .testimony-header > i';
+const outExpo = 'cubic-bezier(0.16, 1, 0.3, 1)';
+const settle = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
+const bounce = 'cubic-bezier(0.34, 1.35, 0.64, 1)';
+
+interface Entrance { keyframes: Keyframe[]; duration: number; easing: string; }
+
+/** Each kind of content arrives in its own way, so a long page never repeats a single movement. */
+function entranceFor(element: Element): Entrance {
+  const side = Array.prototype.indexOf.call(element.parentElement?.children ?? [], element) % 2 ? 1 : -1;
+  if (element.matches('.section-title, .section-subtitle')) {
+    // Rises out of an unseen slot: revealed from the bottom edge up while it lifts.
+    return { duration: 950, easing: outExpo, keyframes: [
+      { opacity: 0, transform: 'translateY(30px)', clipPath: 'inset(100% 0 0 0)' },
+      { opacity: 1, transform: 'none', clipPath: 'inset(0 0 0 0)' }
+    ] };
+  }
+  if (element.matches('.card, .testimony-card')) {
+    // Stands up from lying back, like a card set upright on a table.
+    return { duration: 1050, easing: outExpo, keyframes: [
+      { opacity: 0, transform: 'perspective(1000px) translateY(60px) rotateX(24deg) scale(0.94)', transformOrigin: '50% 100%' },
+      { opacity: 1, transform: 'perspective(1000px) translateY(0) rotateX(0deg) scale(1)', transformOrigin: '50% 100%' }
+    ] };
+  }
+  if (element.matches('.book-card')) {
+    // Swings open on its spine like a book cover.
+    return { duration: 1150, easing: outExpo, keyframes: [
+      { opacity: 0, transform: 'perspective(1200px) translateX(-30px) rotateY(32deg)', transformOrigin: '0% 50%' },
+      { opacity: 1, transform: 'perspective(1200px) translateX(0) rotateY(0deg)', transformOrigin: '0% 50%' }
+    ] };
+  }
+  if (element.matches('.gallery-item')) {
+    // Photos drop onto the page like prints laid on a table and, with a mouse, develop from pale to full colour.
+    // No rotation: a photo must keep its true shape on screen while it arrives.
+    const develop = element.ownerDocument.defaultView?.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    return { duration: 950, easing: bounce, keyframes: [
+      { opacity: 0, transform: 'translateY(46px) scale(0.86)', ...(develop ? { filter: 'saturate(0.15) brightness(1.3)' } : {}) },
+      { opacity: 1, transform: 'none', ...(develop ? { filter: 'none' } : {}) }
+    ] };
+  }
+  if (element.matches('.belief-item')) {
+    // Beliefs glide in from alternate sides, the flow zig-zagging down the page.
+    return { duration: 1000, easing: outExpo, keyframes: [
+      { opacity: 0, transform: `translateX(${side * 80}px) rotate(${side * 1.5}deg)` },
+      { opacity: 1, transform: 'none' }
+    ] };
+  }
+  if (element.matches('.belief-spotlight')) {
+    return { duration: 1100, easing: bounce, keyframes: [{ opacity: 0, transform: 'scale(0.86)' }, { opacity: 1, transform: 'none' }] };
+  }
+  if (element.matches('.verse')) {
+    return { duration: 800, easing: outExpo, keyframes: [{ opacity: 0, transform: 'translateX(-44px)' }, { opacity: 1, transform: 'none' }] };
+  }
+  if (element.matches('.footer-section, .video-section')) {
+    return { duration: 900, easing: outExpo, keyframes: [{ opacity: 0, transform: 'translateY(48px) scale(0.96)' }, { opacity: 1, transform: 'none' }] };
+  }
+  return { duration: 750, easing: settle, keyframes: [{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'none' }] };
+}
 
 /**
  * Scroll reveals and pointer tilt for every page. Pages need no markup for it: content is found by class
@@ -21,6 +78,8 @@ export class Motion {
   private readonly document = inject(DOCUMENT);
   private readonly seen = new WeakSet<Element>();
   private readonly waiting = new Map<Element, Animation>();
+  /** Icon and underline flourishes that follow a reveal, cancelled with it when motion is switched off. */
+  private readonly flourishes = new Set<Animation>();
   private readonly stops: (() => void)[] = [];
   private reducedMotion?: MediaQueryList;
   private reveals?: IntersectionObserver;
@@ -98,7 +157,8 @@ export class Motion {
       this.seen.add(element);
       // Only the outermost block moves, so nested content does not slide twice.
       if (element.closest(staticSelector) || element.parentElement?.closest(revealSelector)) continue;
-      const animation = element.animate(revealFrames, revealTiming);
+      const { keyframes, duration, easing } = entranceFor(element);
+      const animation = element.animate(keyframes, { duration, easing, fill: 'backwards' });
       animation.pause();
       this.waiting.set(element, animation);
       this.reveals?.observe(element);
@@ -114,8 +174,34 @@ export class Motion {
       this.waiting.delete(entry.target);
       if (!animation) continue;
       // Blocks arriving together follow one another in a short cascade.
-      animation.effect?.updateTiming({ delay: Math.min(order++ * 90, 450) });
+      const delay = Math.min(order++ * 110, 550);
+      animation.effect?.updateTiming({ delay });
       animation.play();
+      this.flourish(entry.target, delay);
+    }
+  }
+
+  /** Once a block has arrived, its icons spin into place and a section title draws its gold underline. */
+  private flourish(block: Element, delay: number): void {
+    const add = (animation: Animation) => {
+      this.flourishes.add(animation);
+      const forget = () => this.flourishes.delete(animation);
+      animation.addEventListener('finish', forget);
+      animation.addEventListener('cancel', forget);
+    };
+    // A browser that ignored `pseudoElement` would squash the title itself, so the underline only draws where it is supported.
+    if (block.matches('.section-title') && typeof KeyframeEffect !== 'undefined' && 'pseudoElement' in KeyframeEffect.prototype) {
+      add(block.animate([{ transform: 'scaleX(0)', opacity: 0 }, { transform: 'scaleX(1)', opacity: 1 }],
+        { pseudoElement: '::after', duration: 1000, delay: delay + 420, easing: outExpo, fill: 'backwards' }));
+    }
+    let index = 0;
+    for (const icon of block.querySelectorAll(iconSelector)) {
+      // The separate scale and rotate properties leave each icon's own transform (such as its gentle float) untouched.
+      add(icon.animate([
+        { scale: '0', rotate: '-150deg', opacity: 0 },
+        { scale: '1.14', rotate: '10deg', opacity: 1, offset: 0.68 },
+        { scale: '1', rotate: '0deg', opacity: 1 }
+      ], { duration: 900, delay: delay + 260 + index++ * 80, easing: settle, fill: 'backwards' }));
     }
   }
 
@@ -135,6 +221,7 @@ export class Motion {
       animation.cancel();
     }
     this.waiting.clear();
+    for (const animation of [...this.flourishes]) animation.cancel();
   }
 
   private tilt(): void {

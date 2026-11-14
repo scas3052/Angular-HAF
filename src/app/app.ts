@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   NavigationCancel, NavigationEnd, NavigationError, NavigationSkipped, NavigationStart, Router, RouterOutlet
 } from '@angular/router';
+import { Effects } from './core/effects';
 import { Motion } from './core/motion';
 import { PageContext } from './core/page-context';
 
@@ -15,7 +16,7 @@ import { PageContext } from './core/page-context';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<div #progress class="scroll-progress" aria-hidden="true"></div>
     <router-outlet />
-    <button type="button" class="back-to-top" [class.show]="showTop()" [attr.aria-label]="copy().top" (click)="toTop()">
+    <button #top type="button" class="back-to-top" [class.show]="showTop()" [attr.aria-label]="copy().top" (click)="toTop()">
       <i class="fas fa-arrow-up" aria-hidden="true"></i>
     </button>
     @if (pending()) {
@@ -34,8 +35,10 @@ export class App {
   private readonly document = inject(DOCUMENT);
   private readonly context = inject(PageContext);
   private readonly motion = inject(Motion);
+  private readonly effects = inject(Effects);
   private readonly destroyRef = inject(DestroyRef);
   private readonly progress = viewChild.required<ElementRef<HTMLElement>>('progress');
+  private readonly topButton = viewChild.required<ElementRef<HTMLElement>>('top');
   private timer: ReturnType<typeof setTimeout> | undefined;
   private smoothTimer: ReturnType<typeof setTimeout> | undefined;
   private navigationId = 0;
@@ -92,6 +95,7 @@ export class App {
     });
     afterNextRender(() => {
       this.motion.start();
+      this.effects.start();
       this.trackScroll();
     });
   }
@@ -113,12 +117,15 @@ export class App {
     if (!view) return;
     const root = this.document.documentElement;
     const bar = this.progress().nativeElement;
+    // The back-to-top button draws the same progress as a ring around itself.
+    const ring = this.topButton().nativeElement;
     let frame = 0;
     const update = () => {
       frame = 0;
       const range = root.scrollHeight - view.innerHeight;
       const ratio = range > 0 ? Math.min(1, Math.max(0, view.scrollY / range)) : 0;
       bar.style.setProperty('--progress', ratio.toFixed(4));
+      ring.style.setProperty('--progress', ratio.toFixed(4));
       this.scrolled.set(view.scrollY > 600);
     };
     const schedule = () => {
