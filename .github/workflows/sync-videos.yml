@@ -1,0 +1,72 @@
+# Keeps the Videos page up to date with the church's YouTube channels: it fetches the channels,
+# sorts new videos into categories and commits src/app/pages/videos/video-library.json, which
+# Vercel then deploys. One-time setup: "Videos Update Automatically" in README.md.
+name: Sync YouTube videos
+
+on:
+  schedule:
+    # Every six hours, at 17 minutes past (UTC), away from the busy top of the hour.
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      allow_shrink:
+        description: Allow removing more than 10% of the videos (only after checking they really were deleted or made private on YouTube)
+        type: boolean
+        default: false
+  push:
+    branches: [master]
+    paths:
+      - 'content/videos/**'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-videos
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Update the video list from YouTube
+        id: sync
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_BASE_URL: ${{ vars.AI_BASE_URL }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          ALLOW_SHRINK: ${{ inputs.allow_shrink }}
+        run: node scripts/sync-videos.mjs --message-file "$RUNNER_TEMP/sync-message.txt"
+
+      - name: Commit the new video list
+        if: steps.sync.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/app/pages/videos/video-library.json
+          git commit -F "$RUNNER_TEMP/sync-message.txt"
+          git pull --rebase origin "$GITHUB_REF_NAME"
+          git push origin "HEAD:$GITHUB_REF_NAME"
+
+      # Only needed if Vercel stops deploying the bot's commits by itself (for example after the
+      # repository is made private on the Hobby plan): add a Vercel Deploy Hook URL as the secret
+      # VERCEL_DEPLOY_HOOK_URL and every update is deployed through it.
+      - name: Ask Vercel to deploy
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo 'VERCEL_DEPLOY_HOOK_URL is not set; Vercel deploys the pushed commit by itself.'
+          else
+            curl --fail --silent --show-error --retry 2 --max-time 60 -X POST "$DEPLOY_HOOK" > /dev/null
+            echo 'Asked Vercel to deploy.'
+          fi

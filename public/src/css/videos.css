@@ -242,7 +242,10 @@
 /* ---------- Shuffle ---------- */
 
 .video-controls {
+  display: flex;
   align-items: center;
+  gap: 10px;
+  margin: 15px 0;
 }
 
 .control-btn {
@@ -313,6 +316,7 @@
   overflow: hidden;
   display: inline-flex;
   align-items: center;
+  gap: 0.55rem;
   min-height: 44px;
   padding: 0.55rem 1.15rem;
   border: 1.5px solid rgba(44, 74, 124, 0.25);
@@ -386,7 +390,6 @@ html[lang='te'] .video-grid:not(:has(> .video-card:not([style*='none'])))::after
   font-style: normal;
 }
 
-/* Filtering switches display inline, so cards stay plain blocks. */
 .video-card {
   display: block;
   overflow: hidden;
@@ -824,5 +827,252 @@ html[lang='te'] .category-btn {
   .play-button {
     width: 56px;
     height: 56px;
+  }
+}
+
+/* ---------- Library extras: counts, status, badges, YouTube-only videos, load more ---------- */
+
+.category-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.9em;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background-color: rgba(44, 74, 124, 0.1);
+  font-family: var(--font-body);
+  font-size: 0.85em;
+  font-variant-numeric: lining-nums tabular-nums;
+  letter-spacing: 0;
+  line-height: 1.4;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.category-btn.active .category-count {
+  background-color: var(--gold);
+  color: var(--ink);
+}
+
+.video-status {
+  flex: 1 1 100%;
+  margin: 0.35rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-variant-numeric: lining-nums;
+}
+
+/* The grid already shows the "no videos" message, so this copy is only for screen readers. */
+.video-status.is-empty {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.video-card.is-new {
+  border-color: rgba(228, 176, 74, 0.6);
+}
+
+.video-badge,
+.video-duration {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.video-badge {
+  top: 0.7rem;
+  left: 0.7rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--gold-fill);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 18px -8px rgba(0, 0, 0, 0.6);
+}
+
+.video-duration {
+  right: 0.6rem;
+  bottom: 0.6rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background-color: rgba(11, 16, 38, 0.82);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1.3;
+}
+
+/* Some owners only allow playing on YouTube itself, so the whole thumbnail links there. */
+.watch-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  color: var(--gold-soft);
+  text-decoration: none;
+}
+
+.watch-link span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border: 1.5px solid rgba(255, 244, 207, 0.85);
+  border-radius: 999px;
+  background-color: rgba(11, 16, 38, 0.72);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.05em;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+  transition: scale 0.45s var(--ease-spring), color 0.3s, border-color 0.3s, background-color 0.3s;
+}
+
+.watch-link i {
+  color: #ff4e45;
+  font-size: 1.15em;
+  transition: color 0.3s;
+}
+
+/* Drawn inside the thumbnail, which clips anything outside it. */
+.watch-link:focus-visible {
+  outline-color: var(--gold-deep);
+  outline-offset: -4px;
+}
+
+.watch-link:focus-visible span {
+  scale: 1.06;
+  border-color: var(--gold);
+  background-color: var(--gold);
+  color: var(--ink);
+}
+
+.watch-link:focus-visible i {
+  color: currentColor;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .video-card:hover .watch-link span {
+    scale: 1.06;
+    border-color: var(--gold);
+    background-color: var(--gold);
+    color: var(--ink);
+  }
+
+  .video-card:hover .watch-link i {
+    color: currentColor;
+  }
+}
+
+.video-more {
+  display: flex;
+  flex: 1 1 100%;
+  justify-content: center;
+  margin-top: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.load-more-btn {
+  padding-inline: 2rem;
+}
+
+/* Upright YouTube Shorts get narrower, taller cards when a list holds nothing else. */
+.video-grid.shorts-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+}
+
+.shorts-grid .video-thumbnail {
+  aspect-ratio: 9 / 16;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .video-section:not(.collapsed) .video-status {
+    animation: haf-fade-in 0.6s var(--ease-out) 0.2s backwards;
+  }
+
+  /* The badge pops in just after its card has settled. */
+  .video-section:not(.collapsed) .video-badge {
+    animation: haf-pop 0.6s var(--ease-spring) calc(var(--card-delay, 0.6s) + 0.4s) backwards;
+  }
+
+  .video-section:not(.collapsed) .video-more {
+    animation: haf-fade-up 0.6s var(--ease-out) 0.3s backwards;
+  }
+}
+
+html[lang='te'] :is(.video-badge, .watch-link span, .category-count) {
+  letter-spacing: normal;
+}
+
+html[lang='te'] .video-badge {
+  font-size: 0.75rem;
+  text-transform: none;
+}
+
+@media (max-width: 560px) {
+  .load-more-btn {
+    width: 100%;
+  }
+
+  /* Chips become one swipeable row that runs to the section edges, so videos start higher up.
+     The gutter matches the .section-content side padding. The vertical padding keeps the focus
+     ring and the active shadow inside the scroll area; the negative margins cancel it out, so
+     the spacing matches wider screens without the rail reaching over the status line. */
+  .video-categories {
+    --rail-gutter: clamp(1rem, 3vw, 2rem);
+    --rail-fade: linear-gradient(90deg, transparent, #000 calc(var(--rail-gutter) / 2),
+      #000 calc(100% - var(--rail-gutter) / 2), transparent);
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin: -0.15rem calc(-1 * var(--rail-gutter)) -0.35rem;
+    padding: 0.5rem var(--rail-gutter) 0.85rem;
+    scroll-padding-inline: var(--rail-gutter);
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(44, 74, 124, 0.25) transparent;
+    -webkit-mask-image: var(--rail-fade);
+    mask-image: var(--rail-fade);
+  }
+
+  .category-btn {
+    flex: none;
+    scroll-snap-align: start;
+  }
+
+  .category-btn.active {
+    box-shadow: 0 7px 16px -10px rgba(11, 16, 38, 0.6);
+  }
+
+  /* Two Shorts side by side, as YouTube shows them on phones. */
+  .video-grid.shorts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .shorts-grid .video-info {
+    padding: 0.75rem 0.8rem 0.9rem;
+  }
+
+  .shorts-grid .video-info::before {
+    right: 0.8rem;
+    left: 0.8rem;
+  }
+
+  .shorts-grid .video-info h3 {
+    font-size: 0.9rem;
+  }
+
+  .shorts-grid .video-info :is(.singer, .message-date) {
+    font-size: 0.8rem;
   }
 }

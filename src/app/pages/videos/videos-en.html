@@ -1,7 +1,5 @@
 <haf-site-header />
 
-      
-
     <main id="main-content" tabindex="-1" class="videos-main">
       <section class="videos-hero">
         <div class="videos-hero-content">
@@ -13,87 +11,67 @@
         </div>
       </section>
 
-      <div class="videos-container" hafVideoCatalog="">
-        
-        <section class="video-section songs-section" hafVideoSection="" #videoSection0="hafVideoSection" [section]="sections[0]">
-          <div class="section-header" hafVideoSectionToggle="">
+      <div class="videos-container" [hafVideoCatalog]="library">
+        @for (section of library.sections; track section.key) {
+        <section class="video-section {{ section.key }}-section" [hafVideoSection]="section" #videoSection="hafVideoSection">
+          <div class="section-header" hafVideoSectionToggle [attr.aria-controls]="section.key + 'Content'">
             <h2>
-              <i class="fas fa-music"></i>
-              Worship Songs
+              <i class="fas {{ section.icon }}" aria-hidden="true"></i>
+              {{ section.title.en }}
             </h2>
-            <span class="video-count">42 Videos</span>
-            <i class="fas fa-chevron-down"></i>
+            <span class="video-count">{{ section.videos.length }} Videos</span>
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
           </div>
-          
-          <div class="section-content">
-            <div class="search-box">
-              <input type="text" id="songSearch" placeholder="Search songs by name..." hafVideoSearch="">
-              <i class="fas fa-search"></i>
-            </div><div class="video-controls" style="display:flex; gap:10px; margin: 15px 0;">
-      <button class="control-btn" id="shuffleVideos" (click)="videoSection0.shuffle()"><i class="fas fa-random"></i> Shuffle</button>
-    </div>
-            
-            <div class="video-grid">@for (card of videoSection0.cards(); track card.key) {
-      <div class="video-card" hafVideoCard [card]="card" [attr.data-category]="card.category"
-        [style.display]="videoSection0.matches(card) ? (videoSection0.filtered() ? 'block' : null) : 'none'"></div>
-    }</div>
-          </div>
-        </section>
 
-        
-        <section class="video-section messages-section" hafVideoSection="" #videoSection1="hafVideoSection" [section]="sections[1]">
-          <div class="section-header" hafVideoSectionToggle="">
-            <h2>
-              <i class="fas fa-microphone-alt"></i>
-              Messages
-            </h2>
-            <span class="video-count">391 Videos</span>
-            <i class="fas fa-chevron-down"></i>
-          </div>
-          
-          <div class="section-content">
+          <div class="section-content" [id]="section.key + 'Content'">
             <div class="search-box">
-              <input type="text" id="messageSearch" placeholder="Search messages by title..." hafVideoSearch="">
-              <i class="fas fa-search"></i>
-            </div><div class="video-controls" style="display:flex; gap:10px; margin: 15px 0;">
-      <button class="control-btn" id="shuffleVideos" (click)="videoSection1.shuffle()"><i class="fas fa-random"></i> Shuffle</button>
-    </div>
-            
-            <div class="video-categories">
-              <button class="category-btn active" data-category="all-messages" hafVideoCategory="all-messages">
-                All Messages
+              <input type="text" [id]="section.key + 'Search'" [placeholder]="section.search.en" [attr.aria-label]="section.search.en"
+                hafVideoSearch autocomplete="off">
+              <i class="fas fa-search" aria-hidden="true"></i>
+            </div>
+            <div class="video-controls">
+              <button class="control-btn" type="button" [id]="section.key + 'Shuffle'" (click)="videoSection.shuffle()">
+                <i class="fas fa-random" aria-hidden="true"></i> Shuffle
               </button>
-              <button class="category-btn" data-category="abraham" hafVideoCategory="abraham">
-                Bro. M. Abraham
+            </div>
+
+            @if (videoSection.showCategories()) {
+            <div class="video-categories" role="group" aria-label="Filter by category">
+              <button class="category-btn" type="button" [hafVideoCategory]="section.all.key" [attr.data-category]="section.all.key">
+                {{ section.all.label.en }} <span class="category-count">{{ videoSection.allCount() }}</span>
               </button>
-              <button class="category-btn" data-category="rani" hafVideoCategory="rani">
-                Smt. M. Rani Abraham
+              @for (category of videoSection.categories(); track category.key) {
+              <button class="category-btn" type="button" [hafVideoCategory]="category.key" [attr.data-category]="category.key">
+                {{ category.label.en }} <span class="category-count">{{ videoSection.counts().get(category.key) }}</span>
               </button>
-              <button class="category-btn" data-category="special" hafVideoCategory="special">
-                Second Saturday Service
+              }
+            </div>
+            }
+
+            <p class="video-status" role="status" [class.is-empty]="!videoSection.matching().length">
+              @if (videoSection.matching().length) {
+              Showing {{ videoSection.visible().length }} of {{ videoSection.matching().length }} {{ videoSection.matching().length === 1 ? 'video' : 'videos' }}
+              } @else {
+              No videos match your search.
+              }
+            </p>
+
+            <div class="video-grid" [class.shorts-grid]="videoSection.allShorts()">
+              @for (video of videoSection.visible(); track video.id) {
+              <div class="video-card" [hafVideoCard]="video"></div>
+              }
+            </div>
+
+            @if (videoSection.remaining()) {
+            <div class="video-more">
+              <button class="control-btn load-more-btn" type="button" (click)="videoSection.showMore()">
+                <i class="fas fa-plus" aria-hidden="true"></i> Load more videos
               </button>
-              <button class="category-btn" data-category="sunday" hafVideoCategory="sunday">
-                Sunday Service
-              </button>
-              <button class="category-btn" data-category="retreats" hafVideoCategory="retreats">
-                Retreats
-              </button>
-              <button class="category-btn" data-category="ai" hafVideoCategory="ai">
-                AI Animated Series
-              </button>
-              <button class="category-btn" data-category="testimonies" hafVideoCategory="testimonies">
-                Testimonies
-              </button>
-              <button class="category-btn" data-category="Shorts" hafVideoCategory="Shorts">
-                Other Messages
-            </button></div>
-            
-            <div class="video-grid">@for (card of videoSection1.cards(); track card.key) {
-      <div class="video-card" hafVideoCard [card]="card" [attr.data-category]="card.category"
-        [style.display]="videoSection1.matches(card) ? (videoSection1.filtered() ? 'block' : null) : 'none'"></div>
-    }</div>
+            </div>
+            }
           </div>
         </section>
+        }
       </div>
     </main>
 

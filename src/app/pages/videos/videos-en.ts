@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 import { SiteHeader, SiteFooter } from '../../shared/site-layout';
 import { VideoCatalog, VideoSection, VideoSectionToggle, VideoSearch, VideoCategory, VideoCard } from '../../features/videos';
-import { sections } from './videos-en.data';
+import { library } from './video-library';
 
 @Component({
   selector: 'haf-videos-en',
@@ -14,6 +14,6 @@ import { sections } from './videos-en.data';
 })
 export class VideosEnglishPage {
 
-  readonly sections = sections;
+  readonly library = library;
 
 }

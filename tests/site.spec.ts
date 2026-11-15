@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { legacyPageUrls } from '../src/app/page-urls';
 import { serviceSchedule } from '../src/app/features/service-schedule';
+import type { LibraryVideo, VideoLibrary } from '../src/app/features/videos';
 
 const root = path.resolve(__dirname, '..');
 const hasOriginal = existsSync(path.resolve(root, '../HAF-Website/index.html'));
@@ -104,7 +105,8 @@ async function contentText(page: Page): Promise<string> {
     let node: Node | null;
     while ((node = walker.nextNode())) {
       // The footer is a deliberately redesigned shared component, so it has its own tests below.
-      if (!node.parentElement?.closest('script, style, noscript, footer')) {
+      // The video list is now synced from YouTube, so it no longer matches the hand-written original (same wrapper on both).
+      if (!node.parentElement?.closest('script, style, noscript, footer, .videos-container')) {
         const text = node.textContent?.replace(/\s+/g, ' ').trim();
         if (text) parts.push(text);
       }
@@ -515,30 +517,175 @@ test('audio warms up the opened chapter and shows loading and retry states', asy
   await expect(player).toHaveClass(/failed/);
   await expect(player).not.toHaveClass(/loading/);
 });
-test('video search, categories, shuffle, and playback', async ({ page }) => {
+// The video list is synced from YouTube, so the video tests work out what to expect from the current library.
+const videoLibrary: VideoLibrary = JSON.parse(readFileSync(path.join(root, 'src/app/pages/videos/video-library.json'), 'utf8'));
+function videoFacts(key: string) {
+  const section = videoLibrary.sections.find(entry => entry.key === key)!;
+  const inAll = new Set(section.categories.filter(category => category.includeInAll).map(category => category.key));
+  const all = section.videos.filter(video => inAll.has(video.category));
+  const pageSize = videoLibrary.settings.pageSize;
+  const counts = new Map<string, number>();
+  for (const video of section.videos) counts.set(video.category, (counts.get(video.category) ?? 0) + 1);
+  return { section, all, pageSize, counts, firstPage: Math.min(pageSize, all.length) };
+}
+
+// A word found in just one video's title or speaker, so searching for it finds only that video.
+function wordOfItsOwn(videos: LibraryVideo[]): { word: string; video: LibraryVideo } {
+  const texts = videos.map(video => `${video.title} ${video.speaker}`.normalize('NFC').toLowerCase());
+  for (const video of videos) {
+    for (const word of video.title.normalize('NFC').toLowerCase().split(/[^\p{L}\p{M}\p{N}]+/u)) {
+      if (word.length >= 6 && texts.filter(text => text.includes(word)).length === 1) return { word, video };
+    }
+  }
+  throw new Error('No video has a word of its own to search for');
+}
+
+test('videos open one section and play one video at a time, search, and load more', async ({ page }) => {
+  const songs = videoFacts('songs');
+  const messages = videoFacts('messages');
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
   await page.goto('/english/videos', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('.video-section.collapsed')).toHaveCount(2);
-  await page.locator('.section-header').first().click();
-  const songs = page.locator('.songs-section');
-  await expect(songs).not.toHaveClass(/collapsed/);
-  await songs.locator('.play-button').first().click();
-  await expect(songs.locator('.video-thumbnail iframe')).toHaveCount(1);
-  await songs.locator('.play-button').nth(1).click();
-  await expect(songs.locator('.video-thumbnail iframe')).toHaveCount(1);
-  await songs.locator('.search-box input').fill('no-such-video-938257');
-  await expect(songs.locator('.video-card:visible')).toHaveCount(0);
-  await expect(songs.locator('.video-thumbnail iframe')).toHaveCount(0);
-  await songs.locator('.search-box input').fill('Naasanakaramaina');
-  await expect(songs.locator('.video-card:visible')).toHaveCount(1);
-  await page.locator('.messages-section .section-header').click();
-  await expect(songs).toHaveClass(/collapsed/);
-  const messages = page.locator('.messages-section');
-  await messages.locator('[data-category="rani"]').first().click();
-  expect(await messages.locator('.video-card:visible').count()).toBeGreaterThan(0);
-  expect(await messages.locator('.video-card:visible').evaluateAll(cards => cards.every(card => card.getAttribute('data-category')?.split(' ').includes('rani')))).toBe(true);
-  const count = await messages.locator('.video-card').count();
-  await messages.locator('.control-btn').click();
-  await expect(messages.locator('.video-card')).toHaveCount(count);
+  const songList = page.locator('.songs-section');
+  const songCards = songList.locator('.video-card');
+  await expect(songList.locator('.video-count')).toHaveText(`${songs.section.videos.length} Videos`);
+  await songList.locator('.section-header').click();
+  await expect(songList).not.toHaveClass(/collapsed/);
+  await expect(songList.locator('.section-header')).toHaveAttribute('aria-expanded', 'true');
+  await expect(songCards).toHaveCount(songs.firstPage);
+  await expect(songCards.first()).toHaveAttribute('data-video-id', songs.all[0].id);
+
+  const players = page.locator('.videos-container iframe');
+  const [first, second] = songs.all.slice(0, songs.firstPage).filter(video => video.embeddable);
+  await songList.locator(`.video-card[data-video-id="${first.id}"] .play-button`).click();
+  await expect(players).toHaveCount(1);
+  await expect(players).toHaveAttribute('title', first.title);
+  await songList.locator(`.video-card[data-video-id="${second.id}"] .play-button`).click();
+  await expect(players).toHaveCount(1);
+  await expect(players).toHaveAttribute('src', new RegExp(`/embed/${second.id}\\?`));
+  await expect(songList.locator(`.video-card[data-video-id="${first.id}"] .play-button`)).toBeVisible();
+
+  const search = songList.locator('#songsSearch');
+  const status = songList.locator('.video-status');
+  await search.fill('no-such-video-938257');
+  await expect(songCards).toHaveCount(0);
+  await expect(status).toHaveClass(/is-empty/);
+  await expect(status).toHaveText('No videos match your search.');
+  await search.press('Escape');
+  await expect(search).toHaveValue('');
+  await expect(songCards).toHaveCount(songs.firstPage);
+  // The video that was playing was hidden by the search, so it does not start again.
+  await expect(players).toHaveCount(0);
+  const { word, video } = wordOfItsOwn(songs.all);
+  await search.fill(word.toUpperCase());
+  await expect(songCards).toHaveCount(1);
+  await expect(songCards).toHaveAttribute('data-video-id', video.id);
+  await expect(status).toHaveText('Showing 1 of 1 video');
+
+  const messageList = page.locator('.messages-section');
+  const messageCards = messageList.locator('.video-card');
+  await messageList.locator('.section-header').click();
+  await expect(songList).toHaveClass(/collapsed/);
+  await expect(messageCards).toHaveCount(messages.pageSize);
+  await expect(messageList.locator('.video-status')).toHaveText(`Showing ${messages.pageSize} of ${messages.all.length} videos`);
+  const shown = Math.min(messages.pageSize * 2, messages.all.length);
+  await messageList.locator('.load-more-btn').click();
+  await expect(messageCards).toHaveCount(shown);
+  await expect(messageList.locator('.video-status')).toHaveText(`Showing ${shown} of ${messages.all.length} videos`);
+  // Keyboard users carry on from the first new video.
+  await expect(messageCards.nth(messages.pageSize).locator('.play-button, .watch-link')).toBeFocused();
+  const ids = await messageCards.evaluateAll(cards => cards.map(card => card.getAttribute('data-video-id')));
+  expect(new Set(ids).size).toBe(ids.length);
+  expect(errors).toEqual([]);
+});
+
+test('video categories filter the list, shuffling keeps it, and videos that cannot play here open on YouTube', async ({ page }) => {
+  const messages = videoFacts('messages');
+  const { section, counts, pageSize } = messages;
+  await page.goto('/english/videos', { waitUntil: 'domcontentloaded' });
+  const list = page.locator('.messages-section');
+  const cards = list.locator('.video-card');
+  await list.locator('.section-header').click();
+  const chips = [`${section.all.label.en} ${messages.all.length}`,
+    ...section.categories.filter(category => counts.get(category.key)).map(category => `${category.label.en} ${counts.get(category.key)}`)];
+  await expect(list.locator('.category-btn')).toHaveText(chips);
+  await expect(list.locator(`.category-btn[data-category="${section.all.key}"]`)).toHaveAttribute('aria-pressed', 'true');
+
+  // A category short enough to fit on one page.
+  const category = section.categories.find(entry => (counts.get(entry.key) ?? 0) >= 2 && counts.get(entry.key)! <= pageSize)!;
+  const size = counts.get(category.key)!;
+  await list.locator(`.category-btn[data-category="${category.key}"]`).click();
+  await expect(list.locator(`.category-btn[data-category="${category.key}"]`)).toHaveAttribute('aria-pressed', 'true');
+  await expect(list.locator(`.category-btn[data-category="${section.all.key}"]`)).toHaveAttribute('aria-pressed', 'false');
+  await expect(cards).toHaveCount(size);
+  await expect(list.locator('.video-status')).toHaveText(`Showing ${size} of ${size} videos`);
+  await expect(list.locator('.load-more-btn')).toHaveCount(0);
+  const sortedIds = () => cards.evaluateAll(elements => elements.map(element => element.getAttribute('data-video-id')).sort());
+  const before = await sortedIds();
+  expect(await cards.evaluateAll((elements, key) => elements.every(element => element.getAttribute('data-category') === key), category.key)).toBe(true);
+  await list.locator('#messagesShuffle').click();
+  await expect(cards).toHaveCount(size);
+  expect(await sortedIds()).toEqual(before);
+
+  // Some owners turn off playing on other sites; those cards link to YouTube instead of playing here.
+  const external = section.videos.find(video => !video.embeddable
+    && section.videos.filter(other => other.category === video.category).indexOf(video) < pageSize);
+  if (external) {
+    // Shuffling reordered the whole section, so start again from the library order.
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await list.locator('.section-header').click();
+    await list.locator(`.category-btn[data-category="${external.category}"]`).click();
+    const card = list.locator(`.video-card[data-video-id="${external.id}"]`);
+    await expect(card).toHaveClass(/is-external/);
+    await expect(card.locator('.play-button')).toHaveCount(0);
+    await expect(card.locator('.watch-link')).toHaveAttribute('href', `https://www.youtube.com/watch?v=${external.id}`);
+    await expect(card.locator('.watch-link')).toHaveAttribute('target', '_blank');
+    await expect(card.locator('.watch-link')).toHaveAttribute('aria-label', `Watch on YouTube: ${external.title}`);
+  }
+});
+
+test('the Telugu videos page labels everything in Telugu', async ({ page }) => {
+  const messages = videoFacts('messages');
+  const { section, counts } = messages;
+  await page.goto('/telugu/videos', { waitUntil: 'domcontentloaded' });
+  const list = page.locator('.messages-section');
+  await expect(list.locator('.video-count')).toHaveText(`${section.videos.length} వీడియోలు`);
+  await list.locator('.section-header').click();
+  await expect(list.locator('#messagesSearch')).toHaveAttribute('placeholder', section.search.te);
+  await expect(list.locator('#messagesShuffle')).toHaveText('షఫుల్');
+  const chips = [`${section.all.label.te} ${messages.all.length}`,
+    ...section.categories.filter(category => counts.get(category.key)).map(category => `${category.label.te} ${counts.get(category.key)}`)];
+  await expect(list.locator('.category-btn')).toHaveText(chips);
+  await expect(list.locator('.video-status')).toHaveText(`${messages.all.length} వీడియోలలో ${messages.firstPage} చూపబడుతున్నాయి`);
+  await expect(list.locator('.load-more-btn')).toHaveText('మరిన్ని వీడియోలు చూపించు');
+  const playable = messages.all.slice(0, messages.firstPage).find(video => video.embeddable)!;
+  await expect(list.locator(`.video-card[data-video-id="${playable.id}"] .play-button`)).toHaveAttribute('aria-label', `ప్లే చేయండి: ${playable.title}`);
+  await list.locator('#messagesSearch').fill('no-such-video-938257');
+  await expect(list.locator('.video-status')).toHaveText('మీ శోధనకు సరిపోయే వీడియోలు లేవు.');
+});
+
+test('video categories stay in one swipeable row on phones and fit without scrolling on wide screens', async ({ page, isMobile }) => {
+  for (const path of ['/english/videos', '/telugu/videos']) {
+    await page.goto(path, { waitUntil: 'domcontentloaded' });
+    const list = page.locator('.messages-section');
+    await list.locator('.section-header').click();
+    const chips = list.locator('.category-btn');
+    await expect(chips.first()).toBeVisible();
+    // offsetTop ignores the small lift a hovered chip gets, so it counts real rows.
+    const layout = await list.locator('.video-categories').evaluate(rail => ({
+      rows: new Set(Array.from(rail.querySelectorAll<HTMLElement>('.category-btn'), chip => chip.offsetTop)).size,
+      scrolls: rail.scrollWidth > rail.clientWidth,
+      pageWidth: document.documentElement.scrollWidth,
+      viewport: innerWidth
+    }));
+    expect(layout.pageWidth, path).toBeLessThanOrEqual(layout.viewport);
+    if (isMobile) expect(layout, path).toMatchObject({ rows: 1, scrolls: true });
+    else expect(layout.scrolls, path).toBe(false);
+    // The last chip can be reached and chosen.
+    await chips.last().click();
+    await expect(chips.last(), path).toHaveAttribute('aria-pressed', 'true');
+  }
 });
 
 test('testimony search, empty results, expand and shuffle', async ({ page }) => {

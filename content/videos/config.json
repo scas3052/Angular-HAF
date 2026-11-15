@@ -1,0 +1,71 @@
+{
+  "$comment": "Settings for the automatic YouTube video sync. See 'Videos Update Automatically' in README.md before editing.",
+  "channels": [
+    { "key": "main", "id": "UC3GpmL_SvIIMygJErxq_XcA", "name": "Holy Army Fellowship" },
+    { "key": "worship", "id": "UCR4CXEKKcoNFxKcpshyV0Cg", "name": "HAF Worship", "section": "songs" }
+  ],
+  "playlists": [
+    { "key": "short", "id": "PLRPPBi5757oon_6kiP54RzrHQxW-OldNV", "name": "Bro Abraham Garu Short message" },
+    { "key": "retreat", "id": "PLRPPBi5757oqwrRxO_GVM4_ECO4R5Lgsd", "name": "Retreat" },
+    { "key": "fastsun", "id": "PLRPPBi5757oobrptHtVdTbLZzjN2cGQE9", "name": "Fasting Prayers and Sunday Worship" },
+    { "key": "songs", "id": "PLRPPBi5757or34_oCExYViB0VjmwIrHin", "name": "Video Songs", "section": "songs" },
+    { "key": "abraham", "id": "PLRPPBi5757orIA3Wt51zJ6pM4OZmF05se", "name": "Bro M Abraham Video Messages" },
+    { "key": "audio", "id": "PLRPPBi5757ooj8KUabsEo1h_dvnC05DQp", "name": "Bro M Abraham Audio Messages" }
+  ],
+  "defaultSection": "messages",
+  "sections": [
+    {
+      "key": "songs",
+      "title": { "en": "Worship Songs", "te": "పాటలు" },
+      "icon": "fa-music",
+      "search": { "en": "Search songs by name...", "te": "పేరు ద్వారా పాటలను శోధించండి..." },
+      "all": { "key": "all-songs", "label": { "en": "All Songs", "te": "అన్ని పాటలు" } },
+      "keywords": ["song", "album", "పాట"],
+      "exclude": ["పాటించ"],
+      "fallbackCategory": "songs",
+      "categories": [
+        { "key": "songs", "label": { "en": "Songs", "te": "పాటలు" } }
+      ]
+    },
+    {
+      "key": "messages",
+      "title": { "en": "Messages", "te": "వాక్య సందేశాలు" },
+      "icon": "fa-microphone-alt",
+      "search": { "en": "Search messages by title...", "te": "శీర్షిక ద్వారా సందేశాలను శోధించండి..." },
+      "all": { "key": "all-messages", "label": { "en": "All Messages", "te": "అన్ని సందేశాలు" } },
+      "fallbackCategory": "other",
+      "categories": [
+        { "key": "abraham", "label": { "en": "Bro. M. Abraham", "te": "బ్రదర్ ఎం. అబ్రహాం" }, "speaker": "Bro. M. Abraham" },
+        { "key": "rani", "label": { "en": "Smt. M. Rani Abraham", "te": "శ్రీమతి ఎం. రాణి అబ్రహాం" }, "speaker": "Sis. M. Rani Abraham" },
+        { "key": "special", "label": { "en": "Second Saturday Service", "te": "రెండవ శనివారం సేవ" } },
+        { "key": "sunday", "label": { "en": "Sunday Service", "te": "ఆదివారం సేవ" } },
+        { "key": "retreats", "label": { "en": "Retreats", "te": "రిట్రీట్లు" } },
+        { "key": "ai", "label": { "en": "AI Animated Series", "te": "AI యానిమేటెడ్ సిరీస్" } },
+        { "key": "testimonies", "label": { "en": "Testimonies", "te": "సాక్ష్యాలు" } },
+        { "key": "kids", "label": { "en": "Kids Stories", "te": "పిల్లల కథలు" } },
+        { "key": "shorts", "label": { "en": "Shorts", "te": "షార్ట్స్" }, "includeInAll": false },
+        { "key": "other", "label": { "en": "Other Messages", "te": "ఇతర సందేశాలు" } }
+      ]
+    }
+  ],
+  "rules": [
+    { "category": "ai", "keywords": ["Poolagampa", "పూలగంప"] },
+    { "category": "kids", "keywords": ["kids Story", "Kids Stories"] },
+    { "category": "testimonies", "keywords": ["Testimony of", "సాక్ష్యము"] },
+    { "category": "retreats", "keywords": ["Retreat", "Youth Meeting", "రిట్రీట్", "విజయోత్సవ"], "playlists": ["retreat"] },
+    { "category": "special", "keywords": ["Second Saturday", "2nd Saturday", "Fasting Prayer", "ఉపవాస", "రెండవ శనివార", "రెండొవ శనివార"], "exclude": ["Wednesday", "బుధవార"] },
+    { "category": "sunday", "keywords": ["Sunday", "ఆదివార"] },
+    { "category": "rani", "keywords": ["Rani Abraham", "రాణి అబ్రహాం"] },
+    { "category": "abraham", "keywords": ["Bro M Abraham", "Abraham Garu", "Bro Abraham", "అబ్రహాం గారు", "అబ్రహం అయ్యగారి"], "playlists": ["abraham", "audio", "short"] }
+  ],
+  "speakers": [
+    { "name": "Sis. M. Rani Abraham", "aliases": ["Rani Abraham", "రాణి అబ్రహాం"] },
+    { "name": "Bro. M. Abraham", "aliases": ["Bro M Abraham", "Abraham Garu", "Bro Abraham", "అబ్రహాం గారు"] }
+  ],
+  "shorts": { "category": "shorts", "maxSeconds": 180 },
+  "matcher": { "minConfidence": 0.9, "minKnownWords": 2 },
+  "ai": { "batchSize": 15, "maxRequestsPerRun": 5, "temperature": 0, "descriptionChars": 300, "timeoutSeconds": 60, "delayMs": 2000, "examplesPerCategory": 3 },
+  "safety": { "maxShrink": 0.1 },
+  "display": { "pageSize": 24, "newBadgeDays": 14 },
+  "timeZone": "Asia/Kolkata"
+}
