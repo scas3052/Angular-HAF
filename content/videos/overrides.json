@@ -1,0 +1,6 @@
+{
+  "$comment": "Fixes for single videos, keyed by YouTube video ID. Fields: category, speaker, title, date, hide, pin. See 'Videos Update Automatically' in README.md.",
+  "videos": {
+    "ySA6wgUsy2A": { "pin": true }
+  }
+}

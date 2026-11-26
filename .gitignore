@@ -43,6 +43,10 @@ __screenshots__/
 /.vercel/
 /.audio-cache/
 
+# Local keys for npm run videos:sync
+.env.local
+.env.*.local
+
 # System files
 .DS_Store
 Thumbs.db

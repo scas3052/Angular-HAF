@@ -13,10 +13,10 @@
       <section class="gallery-filter">
         <div class="filter-container">
           
-          <button class="filter-btn active" data-filter="all" (click)="filter.set('all')" [class.active]="filter() === 'all'">
+          <button class="filter-btn active" data-filter="all" (click)="setFilter('all')" [class.active]="filter() === 'all'">
             <i class="fas fa-th"></i> All Photos
           </button>
-          <button class="filter-btn" data-filter="foundation" (click)="filter.set('foundation')" [class.active]="filter() === 'foundation'">
+          <button class="filter-btn" data-filter="foundation" (click)="setFilter('foundation')" [class.active]="filter() === 'foundation'">
             <i class="fas fa-hammer"></i> Foundation of Faith
           </button>
         </div>

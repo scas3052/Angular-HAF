@@ -1,205 +1,594 @@
-/* Origin Page Styles */
+/*
+ * Origin of Work - "Midnight & Gold"
+ *
+ * Loaded after style.css only while the origin page (English or Telugu) is open.
+ * The hero (.origin-hero, .origin-hero-content, its h1 and p) is styled entirely
+ * by style.css, so nothing here touches it.
+ *
+ * The timeline is driven by the hafTimeline directive (src/app/features/timeline.ts):
+ * it adds .visible to each .timeline-item once it scrolls into view (and never
+ * removes it), and keeps an inline --scroll-percent on .timeline for the progress
+ * line. The motion service does not touch anything inside .timeline, so every
+ * milestone enters through CSS transitions keyed on .visible. The hidden state lives
+ * on the item's children (never display: none) and the block near the end shows
+ * everything regardless of .visible for reduced motion and print.
+ *
+ * .origin-main and .origin-content stay unpositioned and untransformed because the
+ * directive measures .timeline.offsetTop against the page.
+ */
+
+/* ---------- Page canvas ---------- */
+
 .origin-main {
-  padding-top: 8rem;
-  min-height: calc(100vh - 300px);
-}
-
-.origin-hero {
-  background: linear-gradient(to right, rgba(44, 74, 124, 0.05), rgba(44, 74, 124, 0.1));
-  padding: 3rem 2rem;
-  text-align: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.origin-hero-content {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.origin-hero h1 {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  font-family: 'Cinzel', serif;
-  color: var(--primary-color);
-}
-
-.origin-hero p {
-  font-size: 1.2rem;
-  color: #4a5568;
+  display: block;
+  background:
+    radial-gradient(52rem 36rem at 100% 30%, rgba(245, 196, 81, 0.1), transparent 70%),
+    radial-gradient(46rem 34rem at 0% 72%, rgba(75, 47, 122, 0.07), transparent 70%),
+    var(--cream);
 }
 
 .origin-content {
-  padding: 2rem;
-  max-width: 1000px;
+  max-width: 1160px;
   margin: 0 auto;
+  padding: clamp(3.5rem, 7vw, 6rem) clamp(1rem, 4vw, 2rem) clamp(4.5rem, 8vw, 7rem);
 }
+
+/* A small gold keystone closes the spine below the last milestone. */
+.origin-content::after {
+  content: '';
+  display: block;
+  width: 12px;
+  height: 12px;
+  margin: 0 0 0 calc(1.1rem - 6px);
+  border-radius: 2px;
+  background: var(--gold-fill);
+  box-shadow: 0 0 0 4px var(--cream), 0 0 18px rgba(245, 196, 81, 0.6);
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+/* ---------- Timeline spine ---------- */
 
 .timeline {
+  --origin-spine: 1.1rem;
+  --origin-node: 1.3rem;
   position: relative;
-  padding: 2rem 0;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.25rem, 4vw, 3.25rem);
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem 0 2.5rem;
 }
 
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 100%;
-  background: var(--primary-color);
-  opacity: 0.3;
-}
-
-/* Add progress line */
+.timeline::before,
 .timeline::after {
   content: '';
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2px;
-  height: 0;
-  background: var(--secondary-color);
-  transition: height 0.3s ease-out;
-  z-index: 1;
+  left: calc(var(--origin-spine) - 1.5px);
+  z-index: -1;
+  width: 3px;
+  border-radius: 3px;
+  pointer-events: none;
 }
+
+/* The faint track... */
+.timeline::before {
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(184, 134, 43, 0), rgba(184, 134, 43, 0.3) 6%, rgba(184, 134, 43, 0.3));
+}
+
+/*
+ * ...and the gold line that fills it while the page scrolls, with light flowing
+ * down it. --scroll-percent runs from 0% to 100% over the whole time the timeline
+ * is on screen; scaling it by 1.25 keeps the line level with the milestones being
+ * revealed and lets it reach the keystone before the page runs out of scroll.
+ */
+.timeline::after {
+  top: 1.5rem;
+  height: min(calc(100% - 1.5rem), calc(var(--scroll-percent, 0%) * 1.25));
+  background: linear-gradient(180deg, var(--gold-deep), var(--gold) 30%, var(--gold-soft) 50%, var(--gold) 70%, var(--gold-deep)) 0 0 / 100% 240px repeat-y;
+  box-shadow: 0 0 12px rgba(245, 196, 81, 0.55);
+  transition: height 0.3s var(--ease-out);
+  animation: origin-flow 4s linear infinite;
+}
+
+@keyframes origin-flow {
+  to {
+    background-position: 0 240px;
+  }
+}
+
+/* ---------- Milestones ---------- */
 
 .timeline-item {
-  display: flex;
-  justify-content: center;
-  padding: 2rem 0;
-  width: 100%;
   position: relative;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.5s ease-out;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 1rem;
+  padding-left: 3rem;
 }
 
-.timeline-item.visible {
-  opacity: 1;
-  transform: translateY(0);
+/*
+ * Node on the spine: hollow until its milestone is revealed, then it fills with
+ * gold, pops and sends out two soft rings. The newest milestone keeps pulsing.
+ */
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  top: calc(var(--origin-node) - 11px);
+  left: calc(var(--origin-spine) - 11px);
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  border: 4px solid var(--cream);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold) 45%, var(--gold-deep));
+  box-shadow: 0 0 0 1px rgba(184, 134, 43, 0.45), 0 0 16px rgba(245, 196, 81, 0.55);
+  pointer-events: none;
+  transition:
+    border-color 0.5s ease,
+    box-shadow 0.5s ease,
+    translate 0.5s var(--ease-spring),
+    scale 0.5s var(--ease-spring);
 }
+
+.timeline-item.visible::before {
+  animation:
+    origin-node-pop 0.7s var(--ease-out) 0.1s,
+    origin-node-ring 2.8s ease-out 0.8s 2;
+}
+
+.timeline-item.visible:last-child::before {
+  animation:
+    origin-node-pop 0.7s var(--ease-out) 0.1s,
+    origin-node-ring 3.2s ease-out 0.8s infinite;
+}
+
+@keyframes origin-node-pop {
+  45% {
+    transform: scale(1.45);
+  }
+}
+
+@keyframes origin-node-ring {
+  from {
+    box-shadow: 0 0 0 1px rgba(184, 134, 43, 0.45), 0 0 16px rgba(245, 196, 81, 0.55), 0 0 0 0 rgba(245, 196, 81, 0.55);
+  }
+  to {
+    box-shadow: 0 0 0 1px rgba(184, 134, 43, 0.45), 0 0 16px rgba(245, 196, 81, 0.55), 0 0 0 18px rgba(245, 196, 81, 0);
+  }
+}
+
+/* A branch grows from the spine to the year. */
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--origin-node) - 1px);
+  left: var(--origin-spine);
+  width: 1.9rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold), rgba(228, 176, 74, 0.35));
+  transform-origin: left center;
+  pointer-events: none;
+  transition:
+    transform 0.6s var(--ease-out) 0.35s,
+    translate 0.5s var(--ease-spring);
+}
+
+/* ---------- Year pills ---------- */
 
 .timeline-date {
-  background: var(--primary-color);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 30px;
-  font-family: 'Cinzel', serif;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  min-height: 2.6rem;
+  /* The extra start padding balances the letter-spacing after the last digit. */
+  padding: 0.45rem 1.35rem 0.45rem calc(1.35rem + 0.14em);
+  overflow: hidden;
+  border: 1px solid rgba(245, 196, 81, 0.5);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ink-3), var(--ink));
+  box-shadow: 0 12px 26px -12px rgba(11, 16, 38, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 0.4vw + 0.92rem, 1.2rem);
   font-weight: 700;
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition:
+    opacity 0.7s var(--ease-out) 0.25s,
+    transform 0.8s var(--ease-out) 0.25s,
+    translate 0.5s var(--ease-spring),
+    scale 0.5s var(--ease-spring),
+    box-shadow 0.45s ease;
 }
+
+/* "Present" is the one solid gold pill. */
+.timeline-item:last-child > .timeline-date {
+  border-color: rgba(255, 244, 207, 0.75);
+  background: var(--gold-fill);
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  color: var(--ink);
+}
+
+/* A glint crosses each pill once as it arrives (and again on hover). */
+.timeline-date::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgba(255, 248, 225, 0.55), transparent);
+  transform: translateX(-130%) skewX(-20deg);
+  pointer-events: none;
+}
+
+.timeline-item.visible > .timeline-date::after {
+  animation: haf-sweep 1.3s var(--ease-out) 0.9s backwards;
+}
+
+/* ---------- Story cards ---------- */
 
 .timeline-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 45%;
-  margin-top: 3.5rem;
+  /* The side of the card that faces the spine. */
+  --origin-glow-x: 0%;
   position: relative;
-  transition: transform 0.3s ease;
+  min-width: 0;
+  padding: clamp(1.5rem, 3vw, 2.1rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(22rem 14rem at var(--origin-glow-x) 0%, rgba(245, 196, 81, 0.12), transparent 70%),
+    linear-gradient(180deg, var(--paper) 50%, var(--cream));
+  box-shadow: var(--shadow-sm);
+  overflow-wrap: break-word;
+  transition:
+    opacity 0.8s var(--ease-out) 0.1s,
+    transform 0.9s var(--ease-out) 0.1s,
+    translate 0.5s var(--ease-spring),
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
 }
 
-.timeline-item:nth-child(odd) .timeline-content {
-  margin-right: 55%;
-  transform: translateX(-50px);
+/* The present day glows a little warmer. */
+.timeline-item:last-child > .timeline-content {
+  border-color: rgba(228, 176, 74, 0.38);
+  background:
+    radial-gradient(24rem 16rem at var(--origin-glow-x) 0%, rgba(245, 196, 81, 0.2), transparent 70%),
+    linear-gradient(180deg, var(--paper) 40%, var(--gold-soft));
 }
 
-.timeline-item:nth-child(even) .timeline-content {
-  margin-left: 55%;
-  transform: translateX(50px);
-}
-
-.timeline-item.visible:nth-child(odd) .timeline-content,
-.timeline-item.visible:nth-child(even) .timeline-content {
-  transform: translateX(0);
-}
-
-.timeline-content h3 {
-  color: var(--primary-color);
-  font-family: 'Cinzel', serif;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-}
-
-.timeline-content p {
-  color: #4a5568;
-  line-height: 1.6;
-}
-
+/* Gold tab on the top edge, anchored on the spine side; it spans the card on hover. */
 .timeline-content::before {
   content: '';
   position: absolute;
-  width: 30px;
-  height: 30px;
-  background-image: url('../images/bg/Logo\ Png.png');
-  background-size: cover;
-  background-position: center;
-  border-radius: 50%;
-  top: 15px;
-  z-index: 1;
-  transition: all 0.3s ease;
-  border: 2px solid var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9);
+  top: -1px;
+  left: 1.6rem;
+  right: 1.6rem;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--gold-grad);
+  background-size: 200% auto;
+  transform: scaleX(0.3);
+  transform-origin: var(--origin-glow-x) 50%;
+  transition: transform 0.7s var(--ease-out);
+  pointer-events: none;
 }
 
-.timeline-item.visible .timeline-content::before {
-  transform: scale(1.2);
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.9), 
-              0 0 15px rgba(228, 176, 74, 0.5);
+.timeline-content > h3 {
+  position: relative;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.7rem;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 0.6vw + 1.1rem, 1.55rem);
+  font-weight: 700;
+  line-height: 1.3;
+  text-wrap: balance;
 }
 
-.timeline-item:nth-child(odd) .timeline-content::before {
-  right: -65px;
+.timeline-content > h3::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 5.5rem;
+  max-width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold-2), rgba(228, 176, 74, 0));
+  transform: scaleX(0.45);
+  transform-origin: left center;
+  transition: transform 0.6s var(--ease-out);
+  pointer-events: none;
 }
 
-.timeline-item:nth-child(even) .timeline-content::before {
-  left: -65px;
+.timeline-content > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.8;
+  text-wrap: pretty;
 }
 
-@media (max-width: 768px) {
+.timeline-content > h3,
+.timeline-content > p {
+  transition:
+    opacity 0.6s var(--ease-out) 0.3s,
+    transform 0.7s var(--ease-out) 0.3s;
+}
+
+.timeline-content > p {
+  transition-delay: 0.42s;
+}
+
+/*
+ * ---------- Reveal ----------
+ * Until timeline.ts marks an item .visible its node is hollow, its branch is
+ * folded and its year, card, heading and text wait just beside the spine; they
+ * then emerge outwards in a short stagger (see the transition delays above).
+ */
+
+.timeline-item:not(.visible)::before {
+  border-color: rgba(184, 134, 43, 0.45);
+  background: var(--cream);
+  box-shadow: 0 0 0 4px var(--cream);
+}
+
+.timeline-item:not(.visible)::after {
+  transform: scaleX(0);
+}
+
+.timeline-item:not(.visible) > .timeline-date {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+
+.timeline-item:not(.visible) > .timeline-content {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+
+.timeline-item:not(.visible) > .timeline-content > h3,
+.timeline-item:not(.visible) > .timeline-content > p {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+/* ---------- Hover (fine pointers only) ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .timeline-item.visible:hover::before,
+  .timeline-item.visible:hover::after,
+  .timeline-item.visible:hover > .timeline-date,
+  .timeline-item.visible:hover > .timeline-content {
+    translate: 0 -6px;
+  }
+
+  .timeline-item.visible:hover::before {
+    scale: 1.25;
+  }
+
+  .timeline-item.visible:hover > .timeline-date {
+    scale: 1.05;
+    box-shadow: 0 16px 30px -12px rgba(11, 16, 38, 0.65), 0 0 24px rgba(245, 196, 81, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .timeline-item.visible:last-child:hover > .timeline-date {
+    box-shadow: var(--shadow-gold), 0 0 26px rgba(245, 196, 81, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  }
+
+  /* The transition lives only here, so the glint sweeps across on hover and resets unseen. */
+  .timeline-item.visible:hover > .timeline-date::after {
+    translate: 390% 0;
+    transition: translate 0.9s var(--ease-out);
+  }
+
+  .timeline-item.visible:hover > .timeline-content {
+    border-color: rgba(228, 176, 74, 0.55);
+    box-shadow: var(--shadow), 0 0 46px -16px rgba(245, 196, 81, 0.6);
+  }
+
+  .timeline-item.visible:hover > .timeline-content::before {
+    transform: scaleX(1);
+    animation: haf-shimmer 3s linear infinite;
+  }
+
+  .timeline-item.visible:hover > .timeline-content > h3::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Desktop: milestones alternate around a central spine ---------- */
+
+@media (min-width: 769px) {
+  .origin-content::after {
+    margin-inline: auto;
+  }
+
+  .timeline {
+    --origin-spine: 50%;
+    --origin-node: 2.4rem;
+    --origin-gap: clamp(4rem, 8vw, 6.5rem);
+  }
+
+  .timeline-item {
+    grid-template-columns: minmax(0, 1fr) var(--origin-gap) minmax(0, 1fr);
+    align-items: start;
+    padding-left: 0;
+  }
+
+  .timeline-item > .timeline-date {
+    grid-row: 1;
+    margin-top: 1.1rem;
+  }
+
+  .timeline-item > .timeline-content {
+    grid-row: 1;
+  }
+
+  .timeline-item:nth-child(odd) > .timeline-content {
+    --origin-glow-x: 100%;
+    grid-column: 1;
+  }
+
+  .timeline-item:nth-child(odd) > .timeline-date {
+    grid-column: 3;
+    justify-self: start;
+  }
+
+  .timeline-item:nth-child(even) > .timeline-date {
+    grid-column: 1;
+    justify-self: end;
+  }
+
+  .timeline-item:nth-child(even) > .timeline-content {
+    grid-column: 3;
+  }
+
+  .timeline-item::after {
+    width: calc(var(--origin-gap) / 2);
+  }
+
+  .timeline-item:nth-child(even)::after {
+    left: auto;
+    right: 50%;
+    background: linear-gradient(270deg, var(--gold), rgba(228, 176, 74, 0.35));
+    transform-origin: right center;
+  }
+
+  /* A second branch reaches from the spine to the card. */
+  .timeline-content::after {
+    content: '';
+    position: absolute;
+    top: calc(var(--origin-node) - 2px);
+    width: calc(var(--origin-gap) / 2);
+    height: 2px;
+    border-radius: 2px;
+    pointer-events: none;
+    transition: transform 0.6s var(--ease-out) 0.55s;
+  }
+
+  .timeline-item:nth-child(odd) > .timeline-content::after {
+    left: 100%;
+    background: linear-gradient(90deg, rgba(228, 176, 74, 0.35), var(--gold));
+    transform-origin: right center;
+  }
+
+  .timeline-item:nth-child(even) > .timeline-content::after {
+    right: 100%;
+    background: linear-gradient(270deg, rgba(228, 176, 74, 0.35), var(--gold));
+    transform-origin: left center;
+  }
+
+  .timeline-item:not(.visible) > .timeline-content::after {
+    transform: scaleX(0);
+  }
+
+  /* Hidden pieces wait on the spine side, so nothing is pushed past the page edge. */
+  .timeline-item:nth-child(odd):not(.visible) > .timeline-content {
+    transform: translateX(40px);
+  }
+
+  .timeline-item:nth-child(even):not(.visible) > .timeline-content {
+    transform: translateX(-40px);
+  }
+
+  .timeline-item:nth-child(odd):not(.visible) > .timeline-date {
+    transform: translateX(-20px);
+  }
+
+  .timeline-item:nth-child(even):not(.visible) > .timeline-date {
+    transform: translateX(20px);
+  }
+}
+
+/* ---------- Telugu ---------- */
+
+html[lang='te'] .timeline-date {
+  padding-inline: 1.35rem;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.35;
+}
+
+html[lang='te'] .timeline-content > h3 {
+  line-height: 1.55;
+}
+
+html[lang='te'] .timeline-content > p {
+  line-height: 1.95;
+}
+
+/* ---------- Reduced motion and print: every milestone is fully shown ---------- */
+
+@media print, (prefers-reduced-motion: reduce) {
+  .origin-content .timeline > .timeline-item:not(.visible) > .timeline-date,
+  .origin-content .timeline > .timeline-item:not(.visible) > .timeline-content,
+  .origin-content .timeline > .timeline-item:not(.visible) > .timeline-content > h3,
+  .origin-content .timeline > .timeline-item:not(.visible) > .timeline-content > p {
+    opacity: 1;
+    transform: none;
+  }
+
+  .origin-content .timeline > .timeline-item:not(.visible)::after,
+  .origin-content .timeline > .timeline-item:not(.visible) > .timeline-content::after {
+    transform: none;
+  }
+
+  .origin-content .timeline > .timeline-item:not(.visible)::before {
+    border-color: var(--cream);
+    background: radial-gradient(circle at 35% 30%, var(--gold-soft), var(--gold) 45%, var(--gold-deep));
+    box-shadow: 0 0 0 1px rgba(184, 134, 43, 0.45), 0 0 16px rgba(245, 196, 81, 0.55);
+  }
+}
+
+@media print {
   .origin-main {
-    padding-top: 7rem;
+    background: none;
   }
 
-  .origin-hero h1 {
-    font-size: 2.5rem;
+  .origin-content {
+    padding-block: 1.5rem;
   }
 
+  .origin-content::after,
   .timeline::before,
-  .timeline::after {
-    left: 30px;
+  .timeline::after,
+  .timeline-item::before,
+  .timeline-item::after,
+  .timeline-content::before,
+  .timeline-content::after,
+  .timeline-date::after {
+    display: none;
   }
 
-  .timeline-date {
-    left: 30px;
-    transform: translateX(-50%);
+  .timeline {
+    gap: 1.25rem;
+    padding: 0;
   }
 
-  .timeline-content {
-    width: calc(100% - 60px);
-    margin-left: 60px !important;
-    margin-right: 0 !important;
+  .origin-content .timeline-item {
+    break-inside: avoid;
+    padding-left: 0;
   }
 
-  .timeline-content::before {
-    left: -45px !important;
-    right: auto !important;
+  .origin-content .timeline-item > .timeline-content {
+    border-color: #bbb;
+    background: none;
+    box-shadow: none;
   }
 
-  .timeline-item:nth-child(odd) .timeline-content,
-  .timeline-item:nth-child(even) .timeline-content {
-    transform: translateX(30px);
-  }
-
-  .timeline-item.visible:nth-child(odd) .timeline-content,
-  .timeline-item.visible:nth-child(even) .timeline-content {
-    transform: translateX(0);
+  .origin-content .timeline-item > .timeline-date {
+    border-color: var(--ink);
+    background: none;
+    box-shadow: none;
+    color: var(--ink);
   }
 }

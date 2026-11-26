@@ -1,8 +1,9 @@
-import { Component, DestroyRef, Injectable, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injectable, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
+import { Effects } from '../core/effects';
 
 export interface PrayerCopy {
   fields: Record<'name' | 'place' | 'prayer-type' | 'prayer-request' | 'email', { label: string; placeholder: string }>;
@@ -85,7 +86,7 @@ export class PrayerToast { readonly state = inject(PrayerState); }
       <label for="prayer-request">{{ copy().fields['prayer-request'].label }}</label>
       <textarea id="prayer-request" name="message" rows="6" required [placeholder]="copy().fields['prayer-request'].placeholder" [(ngModel)]="model.message"></textarea>
     </div>
-    <button type="submit" id="submitButton" [disabled]="submitting()" [attr.aria-busy]="submitting()">
+    <button #submitButton type="submit" id="submitButton" [disabled]="submitting()" [attr.aria-busy]="submitting()">
       {{ state.method() === 'whatsapp' ? copy().whatsappLabel : copy().emailLabel }}
       <i [class]="state.method() === 'whatsapp' ? 'fab fa-whatsapp' : 'fas fa-paper-plane'"></i>
     </button>
@@ -98,6 +99,8 @@ export class PrayerForm {
   readonly submitting = signal(false);
   private readonly http = inject(HttpClient);
   private readonly destroy = inject(DestroyRef);
+  private readonly effects = inject(Effects);
+  private readonly submitButton = viewChild<ElementRef<HTMLButtonElement>>('submitButton');
   model = { name: '', email: '', location: '', prayer_type: '', message: '' };
 
   async submit(form: NgForm): Promise<void> {
@@ -109,6 +112,7 @@ export class PrayerForm {
       url.searchParams.set('text', message);
       window.open(url.toString(), '_blank', 'noopener,noreferrer');
       this.state.showToast(this.copy().whatsappToast);
+      this.effects.celebrate(this.submitButton()?.nativeElement);
       this.reset(form);
       return;
     }
@@ -121,6 +125,7 @@ export class PrayerForm {
         .pipe(takeUntilDestroyed(this.destroy)));
       if (!response.success) throw new Error('Submission failed');
       this.state.showToast(this.copy().successToast);
+      this.effects.celebrate(this.submitButton()?.nativeElement);
       this.reset(form);
     } catch {
       if (!this.destroy.destroyed) this.state.showToast(this.copy().errorToast, 'error');

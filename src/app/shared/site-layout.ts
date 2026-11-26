@@ -19,20 +19,27 @@ export class SiteHeader {
   readonly menuOpen = signal(false);
   readonly dropdownOpen = signal(false);
   readonly transparent = signal(window.scrollY > 100);
-  readonly navigationBackground = computed(() => this.transparent()
-    ? 'rgba(255, 255, 255, 0.95)'
-    : 'linear-gradient(135deg, #1a1f3c 0%, #2c4a7c 50%, #1a1f3c 100%)');
 
   constructor() {
     effect(() => {
-      this.dropdownOpen.set(['origin', 'faith', 'chosen'].includes(this.context.kind()));
-      this.menuOpen.set(false);
+      this.context.kind();
+      this.closeMenu();
     });
   }
 
   updateScroll(): void { this.transparent.set(window.scrollY > 100); }
-  toggleMenu(): void { this.menuOpen.update(open => !open); }
-  closeMenu(): void { this.menuOpen.set(false); }
+
+  toggleMenu(): void {
+    const open = !this.menuOpen();
+    this.menuOpen.set(open);
+    // The drawer opens with "About" expanded on its own pages; on wide screens the panel only opens on demand.
+    this.dropdownOpen.set(open && ['origin', 'faith', 'chosen'].includes(this.context.kind()));
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+    this.dropdownOpen.set(false);
+  }
 
   toggleDropdown(event: Event): void {
     event.preventDefault();

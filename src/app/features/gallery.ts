@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Directive, DestroyRef, Injector, afterNextRender, computed, inject, signal } from '@angular/core';
+import { glide, layoutOf } from '../core/flip';
 import { trapFocus } from '../shared/dialog-focus';
 import { galleryImages } from './gallery.data';
 
@@ -42,9 +43,18 @@ export class GalleryState {
     inject(DestroyRef).onDestroy(() => this.close());
   }
 
+  /** Changes the filter; the photos that stay glide to their new places. */
+  setFilter(filter: string): void {
+    if (this.filter() === filter) return;
+    const before = layoutOf(this.document.querySelectorAll<HTMLElement>('.gallery-item'));
+    this.filter.set(filter);
+    afterNextRender(() => glide(before), { injector: this.injector });
+  }
+
   open(index: number): void {
     this.previousOverflow = this.document.body.style.overflow;
     this.previousFocus = this.document.activeElement as HTMLElement | null;
+    this.zoomFrom(index);
     this.selectedIndex.set(index);
     this.preloadNeighbours();
     this.document.body.style.overflow = 'hidden';
@@ -63,7 +73,25 @@ export class GalleryState {
     if (this.selectedIndex() !== null && count) {
       this.selectedIndex.update(index => ((index ?? 0) + direction + count) % count);
       this.preloadNeighbours();
+      // The next photo slides in from the side the visitor is moving towards.
+      afterNextRender(() => {
+        if (this.document.defaultView?.matchMedia('(prefers-reduced-motion: reduce)').matches ?? true) return;
+        this.document.getElementById('lightbox-img')?.animate(
+          [{ opacity: 0, transform: `translateX(${direction * 80}px) scale(0.94) rotate(${direction * 1.5}deg)` }, { opacity: 1, transform: 'none' }],
+          { duration: 520, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+      }, { injector: this.injector });
     }
+  }
+
+  /** The opened photo flies out of its thumbnail: the lightbox's entrance (gallery.css) starts from the thumbnail's centre. */
+  private zoomFrom(index: number): void {
+    const view = this.document.defaultView;
+    const lightbox = this.document.getElementById('lightbox');
+    const item = this.document.querySelector(`.gallery-item[data-index="${index}"]`);
+    if (!view || !lightbox || !item) return;
+    const bounds = item.getBoundingClientRect();
+    lightbox.style.setProperty('--from-x', `${Math.round(bounds.left + bounds.width / 2 - view.innerWidth / 2)}px`);
+    lightbox.style.setProperty('--from-y', `${Math.round(bounds.top + bounds.height / 2 - view.innerHeight / 2)}px`);
   }
 
   /** Fetches the photos either side of the open one so next/previous shows instantly. */

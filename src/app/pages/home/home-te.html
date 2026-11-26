@@ -4,7 +4,12 @@
 
     <main id="main-content" tabindex="-1">
     <section class="hero">
+      <div class="hero-particles" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
       <div class="hero-content">
+        <div class="hero-emblem" aria-hidden="true"><img src="/src/images/bg/logo-emblem.webp" alt="" width="120" height="120"></div>
         <h1>పరిశుద్ధ సైనిక సహవాసానికి స్వాగతం</h1>
         <p>
           విశ్వాసం మరియు సేవలో కలిసి పెరుగుతూ ఆరాధన మరియు సహవాసంలో మాతో చేరండి
@@ -12,11 +17,12 @@
         <div class="hero-buttons">
           <a [routerLink]="[]" fragment="contact" class="cta-button">ఈ ఆదివారం మాతో చేరండి </a>
           <a class="cta-button" title="Change Language" routerLink="/language">
-            <i class="fas fa-language"></i>
+            <i class="fas fa-language" aria-hidden="true"></i>
             భాషను ఎంచుకోండి 
           </a>
         </div>
       </div>
+      <div class="hero-scroll" aria-hidden="true"></div>
     </section>
 
     <section class="section">

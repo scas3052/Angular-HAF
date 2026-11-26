@@ -4,7 +4,12 @@
 
     <main id="main-content" tabindex="-1">
     <section class="hero">
+      <div class="hero-particles" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
       <div class="hero-content">
+        <div class="hero-emblem" aria-hidden="true"><img src="/src/images/bg/logo-emblem.webp" alt="" width="120" height="120"></div>
         <h1>Welcome to Holy Army Fellowship</h1>
         <p>
           Join us in worship and fellowship as we grow together in faith and
@@ -13,11 +18,12 @@
         <div class="hero-buttons">
           <a [routerLink]="[]" fragment="contact" class="cta-button">Join Us This Sunday</a>
           <a class="cta-button" title="Change Language" routerLink="/language">
-            <i class="fas fa-language"></i>
+            <i class="fas fa-language" aria-hidden="true"></i>
             Select Language
           </a>
         </div>
       </div>
+      <div class="hero-scroll" aria-hidden="true"></div>
     </section>
     <section class="section">
       <div class="container">

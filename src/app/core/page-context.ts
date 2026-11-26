@@ -8,22 +8,6 @@ interface PreparedPage {
   links: HTMLLinkElement[];
 }
 
-const languageKey = 'haf-language';
-
-/** The home page of the language the visitor last browsed in, or null on a first visit or when storage is unavailable. */
-export function savedLanguageHome(): string | null {
-  try {
-    const language = localStorage.getItem(languageKey);
-    return language === 'en' ? '/english/home' : language === 'te' ? '/telugu/home' : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveLanguage(language: 'en' | 'te'): void {
-  try { localStorage.setItem(languageKey, language); } catch { /* Storage can be blocked; the choice is simply not remembered. */ }
-}
-
 @Injectable({ providedIn: 'root' })
 export class PageContext {
   private readonly document = inject(DOCUMENT);
@@ -69,17 +53,27 @@ export class PageContext {
   private apply({ route, links }: PreparedPage): void {
     this.prepared.clear();
     for (const link of this.pageLinks()) {
-      if (links.includes(link)) link.removeAttribute('media');
+      if (links.includes(link)) this.enable(link);
       else link.remove();
     }
     this.language.set(route.data['language'] ?? 'en');
     this.kind.set(route.data['kind'] ?? 'loading');
     this.layout.set(route.data['layout'] ?? {});
     this.document.documentElement.lang = this.language();
-    if (route.data['language']) saveLanguage(this.language());
     this.document.body.style.overflow = '';
     // Zoneless change detection is scheduled asynchronously, so without this the browser can paint the new page before its header and navigation render.
     this.appRef.tick();
+  }
+
+  private enable(link: HTMLLinkElement): void {
+    const sheet = link.sheet;
+    if (!sheet) {
+      link.removeAttribute('media');
+      return;
+    }
+    // Changing the media attribute makes older Chromium-based browsers (such as many Android phones) download the stylesheet again and
+    // show the page unstyled until it arrives, so the loaded sheet's own media list is cleared instead. The attribute keeps saying "print".
+    if (sheet.media.length) sheet.media.mediaText = '';
   }
 
   private pageLinks(): HTMLLinkElement[] {
@@ -90,7 +84,7 @@ export class PageContext {
     const link = this.document.createElement('link');
     link.rel = 'stylesheet';
     link.href = url;
-    // A non-matching media type downloads the stylesheet without applying it; apply() switches it on when the page swaps in.
+    // A non-matching media type downloads the stylesheet without applying it; enable() switches it on when the page swaps in.
     // Such downloads default to the lowest priority, which would delay navigation, so it is raised explicitly.
     link.media = 'print';
     link.fetchPriority = 'high';

@@ -1,335 +1,902 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* ==========================================================================
+   Prayer Request — "Midnight & Gold"
+   Loaded after style.css while the prayer page (EN + TE) is active.
+   Generic elements are scoped to the page wrapper / #prayerForm so nothing
+   leaks into the shared header, navigation drawer or footer.
+   ========================================================================== */
 
-        :root {
-            --primary-color: #1a365d;
-            --accent-color: #4c51bf;
-            --bg-color: #f7fafc;
-            --text-color: #2d3748;
-            --gold: #d69e2e;
-            --success-color: #10B981;
-            --error-color: #EF4444;
-            --whatsapp-color: #25D366;
-        }
+/* ---------- Page wrapper + night band behind the fixed header ---------- */
 
-        body {
-            min-height: 100vh;
-            font-family: 'Cormorant Garamond', serif;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-            line-height: 1.6;
-            font-size: 18px;
-            background-image: linear-gradient(rgba(247, 250, 252, 0.9), rgba(247, 250, 252, 0.9)),
-                url('/src/images/bg/prayer-request-bg.jpg');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-        }
+:is(haf-prayer-request-en, haf-prayer-request-te) > .container {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  align-items: start;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  max-width: none;
+  margin: 0;
+  padding:
+    calc(var(--header-h) + clamp(2rem, 4vw, 3.25rem))
+    max(clamp(1rem, 4vw, 2.5rem), calc((100% - 1320px) / 2))
+    clamp(3.5rem, 7vw, 6rem);
+  background:
+    radial-gradient(60rem 40rem at 100% 30%, rgba(245, 196, 81, 0.1), transparent 65%),
+    radial-gradient(50rem 36rem at 0% 80%, rgba(75, 47, 122, 0.08), transparent 65%),
+    var(--cream);
+}
 
-        .container {
-            max-width: 1400px;
-            margin: 100px auto 0;
-            padding: 2rem;
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 3rem;
-        }
+:is(haf-prayer-request-en, haf-prayer-request-te) > .container::before,
+:is(haf-prayer-request-en, haf-prayer-request-te) > .container::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: calc(var(--header-h) + clamp(9rem, 15vw, 13rem));
+  border-radius: 0 0 50% 50% / 0 0 48px 48px;
+  pointer-events: none;
+}
 
-        .verses-sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-        }
+:is(haf-prayer-request-en, haf-prayer-request-te) > .container::before {
+  background: var(--ink-grad);
+}
 
-        .verse {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid #e2e8f0;
-        }
+/* Static starfield shared by the night band and the form card's cap */
+:is(haf-prayer-request-en, haf-prayer-request-te) > .container::after,
+.form-container::after {
+  background-image:
+    radial-gradient(1.2px 1.2px at 24px 36px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 140px 90px, rgba(255, 255, 255, 0.75), transparent),
+    radial-gradient(1.6px 1.6px at 70px 170px, rgba(255, 228, 160, 0.9), transparent),
+    radial-gradient(1px 1px at 200px 30px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1.3px 1.3px at 250px 210px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 310px 120px, rgba(255, 240, 200, 0.7), transparent);
+  background-size: 220px 220px, 290px 290px, 340px 340px, 260px 260px, 330px 330px, 380px 380px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent);
+}
 
-        .verse:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
+/* ---------- Verses sidebar: a golden scripture timeline ---------- */
 
-        .verse-number {
-            color: var(--gold);
-            font-family: 'Cinzel', serif;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-        }
+.verses-sidebar {
+  --prayer-rail: 1.35rem;
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  padding: clamp(1.5rem, 3vw, 2.25rem) clamp(1.1rem, 2.5vw, 1.75rem);
+  border: 1px solid rgba(228, 176, 74, 0.35);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--paper), #fdfaf2);
+  box-shadow:
+    0 2px 6px rgba(11, 16, 38, 0.05),
+    0 26px 60px -30px rgba(11, 16, 38, 0.4);
+  animation: haf-slide-right 0.9s var(--ease-out) 0.1s backwards;
+}
 
-        .verse-text {
-            font-size: 1.1rem;
-            color: var(--text-color);
-            font-style: italic;
-        }
+.verses-sidebar::before {
+  content: '';
+  position: absolute;
+  inset: 0 12% auto;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background: var(--gold-grad);
+  background-size: 200% auto;
+  animation: haf-shimmer 6s linear infinite;
+  pointer-events: none;
+}
 
-        .form-container {
-            background: rgba(255, 255, 255, 0.98);
-            padding: 3rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            margin-top: 2rem;
-        }
+/* Faint cross watermark */
+.verses-sidebar::after {
+  content: '';
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: -1;
+  width: 7.5rem;
+  height: 10rem;
+  background:
+    linear-gradient(var(--gold-2), var(--gold-2)) 50% 0 / 14px 100% no-repeat,
+    linear-gradient(var(--gold-2), var(--gold-2)) 50% 28% / 100% 14px no-repeat;
+  opacity: 0.09;
+  -webkit-mask-image: linear-gradient(180deg, #000 40%, transparent);
+  mask-image: linear-gradient(180deg, #000 40%, transparent);
+  pointer-events: none;
+}
 
-        .request-method-buttons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            justify-content: center;
-        }
+/* .verse itself is revealed by the JS motion service: no CSS animation here */
+.verse {
+  position: relative;
+  padding: 0.9rem 1rem 0.9rem 2.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  transition:
+    background-color 0.35s var(--ease-out),
+    border-color 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out);
+}
 
-        .method-btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: var(--bg-color);
-            color: var(--text-color);
-        }
+.verse + .verse {
+  margin-top: 0.35rem;
+}
 
-        .method-btn i {
-            font-size: 1.2rem;
-        }
+.verse::before {
+  content: '';
+  position: absolute;
+  top: 1.05rem;
+  left: calc(var(--prayer-rail) - 0.4rem);
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--gold-fill);
+  box-shadow: 0 0 0 4px rgba(245, 196, 81, 0.18);
+  transition:
+    scale 0.4s var(--ease-spring),
+    box-shadow 0.35s var(--ease-out);
+  pointer-events: none;
+}
 
-        .method-btn.active {
-            background: var(--accent-color);
-            color: white;
-        }
+.verse::after {
+  content: '';
+  position: absolute;
+  top: 2.15rem;
+  bottom: -1.1rem;
+  left: calc(var(--prayer-rail) - 1px);
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(228, 176, 74, 0.65), rgba(228, 176, 74, 0.15));
+  pointer-events: none;
+}
 
-        .method-btn:hover {
-            transform: translateY(-2px);
-        }
+.verse:last-child::after {
+  display: none;
+}
 
-        h1 {
-            font-family: 'Cinzel', serif;
-            color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
+.verse-number {
+  position: relative;
+  display: block;
+  padding-bottom: 0.35rem;
+  color: #8a6418;
+  font: 700 0.8rem/1.4 var(--font-display);
+  letter-spacing: 0.14em;
+  transition: translate 0.35s var(--ease-spring);
+}
 
-        .subtitle {
-            text-align: center;
-            color: var(--accent-color);
-            font-style: italic;
-            margin-bottom: 2rem;
-            font-size: 1.2rem;
-        }
+.verse-number::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1.75rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold-2), rgba(245, 196, 81, 0.2));
+  transform-origin: left;
+  transition: scale 0.4s var(--ease-spring);
+  pointer-events: none;
+}
 
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
+.verse-text {
+  margin-top: 0.45rem;
+  color: var(--text);
+  font: italic 400 0.98rem/1.7 var(--font-body);
+  transition: translate 0.35s var(--ease-spring);
+}
 
-        label {
-            display: block;
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
+/* ---------- Form card with a dark, starry cap ---------- */
 
-        input, textarea, select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #cbd5e0;
-            border-radius: 0.5rem;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
+.form-container {
+  --prayer-pad: clamp(1.25rem, 3.5vw, 2.75rem);
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  min-width: 0;
+  padding: var(--prayer-pad);
+  border: 1px solid rgba(228, 176, 74, 0.35);
+  border-radius: var(--radius);
+  background:
+    radial-gradient(120% 60% at 50% 100%, rgba(245, 196, 81, 0.12), transparent 60%),
+    var(--paper);
+  box-shadow:
+    0 2px 6px rgba(11, 16, 38, 0.06),
+    0 30px 70px -30px rgba(11, 16, 38, 0.45),
+    0 0 90px -40px rgba(245, 196, 81, 0.55);
+  scroll-margin-top: calc(var(--header-h) + 1rem);
+  animation: haf-fade-up 0.9s var(--ease-out) 0.1s backwards;
+}
 
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(76, 81, 191, 0.2);
-        }
+/* The cap is two grid items spanning the h1 + subtitle rows, bled to the card edges */
+.form-container::before,
+.form-container::after {
+  content: '';
+  position: relative;
+  z-index: 0;
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  margin: calc(var(--prayer-pad) * -1) calc(var(--prayer-pad) * -1) 0;
+  border-radius:
+    calc(var(--radius) - 1px) calc(var(--radius) - 1px) 50% 50% /
+    calc(var(--radius) - 1px) calc(var(--radius) - 1px) 36px 36px;
+  pointer-events: none;
+}
 
-        button[type="submit"] {
-            background: var(--accent-color);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 0.5rem;
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 1rem;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-        }
+.form-container::before {
+  background:
+    radial-gradient(28rem 12rem at 50% 0%, rgba(245, 196, 81, 0.22), transparent 70%),
+    var(--ink-grad);
+}
 
-        button[type="submit"]:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
-        }
+.form-container > h1 {
+  position: relative;
+  z-index: 1;
+  grid-row: 1;
+  grid-column: 1;
+  margin: clamp(0.25rem, 1.5vw, 1rem) 0 0;
+  padding-block: 0.1em;
+  font: 900 clamp(2rem, 3vw + 1rem, 3.1rem) / 1.15 var(--font-display);
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--gold);
+  background: var(--gold-grad);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation:
+    haf-title-reveal 1.1s var(--ease-out) 0.2s backwards,
+    haf-shimmer 8s linear 1.3s infinite;
+}
 
-        .loading-spinner {
-            display: none;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #ffffff;
-            border-top: 3px solid transparent;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+.form-container > .subtitle {
+  position: relative;
+  z-index: 1;
+  grid-row: 2;
+  grid-column: 1;
+  max-width: 36rem;
+  margin: 1rem auto 2.75rem;
+  color: rgba(255, 255, 255, 0.82);
+  font: italic 400 clamp(1rem, 0.4vw + 0.95rem, 1.18rem) / 1.7 var(--font-body);
+  text-align: center;
+  text-wrap: pretty;
+  animation: haf-fade-up 0.8s var(--ease-out) 0.35s backwards;
+}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+/* Gold divider with a centre jewel, drawn outwards */
+.form-container > .subtitle::before {
+  content: '';
+  display: block;
+  width: 7rem;
+  height: 14px;
+  margin: 0 auto 1rem;
+  background:
+    radial-gradient(circle, var(--gold) 0 3.5px, transparent 4px) center / 14px 14px no-repeat,
+    linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold) 70%, transparent) center / 100% 2px no-repeat;
+  transform-origin: center;
+  animation: haf-draw 1s var(--ease-out) 0.5s backwards;
+  pointer-events: none;
+}
 
-        .loading-spinner.show {
-            display: block;
-        }
+/* ---------- WhatsApp / Email segmented toggle ---------- */
 
-        /* Toast Notification Styles */
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            pointer-events: none;
-        }
+.request-method-buttons {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  justify-self: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  width: min(100%, 34rem);
+  margin: -1.6rem 0 clamp(1.5rem, 3vw, 2rem);
+  padding: 0.35rem;
+  border: 1px solid rgba(228, 176, 74, 0.45);
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow:
+    0 18px 40px -18px rgba(11, 16, 38, 0.55),
+    0 0 0 4px rgba(245, 196, 81, 0.14);
+  animation: haf-zoom-in 0.7s var(--ease-spring) 0.45s backwards;
+}
 
-        .toast {
-            background: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: 'Cinzel', serif;
-            min-width: 300px;
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
-            animation: slideIn 0.3s ease forwards;
-            pointer-events: auto;
-        }
+.method-btn {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: 700 0.9rem/1.25 var(--font-display);
+  letter-spacing: 0.03em;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 0.3s var(--ease-out),
+    background-color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out),
+    scale 0.2s var(--ease-out);
+}
 
-        .toast.success {
-            border-left: 4px solid var(--success-color);
-            background: #ECFDF5;
-            color: #065F46;
-        }
+.method-btn > i {
+  flex: none;
+  font-size: 1.15em;
+  color: var(--gold-deep);
+  transition:
+    scale 0.35s var(--ease-spring),
+    rotate 0.35s var(--ease-spring),
+    color 0.3s var(--ease-out);
+}
 
-        .toast.error {
-            border-left: 4px solid var(--error-color);
-            background: #FEF2F2;
-            color: #991B1B;
-        }
+/* Fallback fill; replaced by the sliding indicator where :has() is supported */
+.method-btn.active {
+  color: var(--ink);
+  background: var(--gold-fill);
+  box-shadow: var(--shadow-gold);
+}
 
-        .toast i {
-            font-size: 20px;
-        }
+.method-btn.active > i {
+  color: var(--ink);
+}
 
-        .toast.hide {
-            animation: slideOut 0.3s ease forwards;
-        }
+.method-btn:active {
+  scale: 0.97;
+}
 
-        @keyframes slideIn {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+.method-btn:focus-visible {
+  outline-color: var(--gold-deep);
+}
 
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-        }
+/* ---------- Form fields ---------- */
 
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
-                margin-top: 120px;
-            }
+#prayerForm {
+  display: grid;
+  gap: 1.15rem;
+}
 
-            .verses-sidebar {
-                position: static;
-                margin-bottom: 2rem;
-            }
+#prayerForm > .form-group {
+  position: relative;
+  display: grid;
+  gap: 0.5rem;
+  animation: haf-fade-up 0.6s var(--ease-out) 0.5s backwards;
+}
 
-            .form-container {
-                margin-top: 0;
-            }
-        }
+#prayerForm > .form-group:has(#place) {
+  animation-delay: 0.58s;
+}
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-                margin-top: 140px;
-            }
+#prayerForm > .form-group:has(#prayer-type) {
+  animation-delay: 0.66s;
+}
 
-            .form-container {
-                padding: 1.5rem;
-            }
+#prayerForm > .form-group:has(#prayer-request) {
+  animation-delay: 0.74s;
+}
 
-            .request-method-buttons {
-                flex-direction: column;
-            }
+#prayerForm > #email-field {
+  animation: haf-fade-down 0.45s var(--ease-out) backwards;
+}
 
-            .method-btn {
-                width: 100%;
-                justify-content: center;
-            }
+#prayerForm label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text);
+  font: 700 0.98rem/1.4 var(--font-body);
+  transition: color 0.3s var(--ease-out);
+}
 
-            .toast {
-                min-width: 280px;
-                padding: 12px 16px;
-            }
-        }
+#prayerForm label::before {
+  content: '';
+  flex: none;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 1px;
+  background: var(--gold-fill);
+  transform: rotate(45deg);
+  box-shadow: 0 0 0 3px rgba(245, 196, 81, 0.15);
+  transition:
+    scale 0.4s var(--ease-spring),
+    rotate 0.5s var(--ease-spring),
+    box-shadow 0.3s var(--ease-out);
+}
 
-        @media (max-width: 480px) {
-            .container {
-                margin-top: 160px;
-                padding: 0.75rem;
-            }
+#prayerForm .form-group:has(:required) > label::after {
+  content: '*';
+  content: '*' / '';
+  margin-left: -0.3rem;
+  color: var(--gold-deep);
+}
 
-            .toast {
-                min-width: calc(100vw - 48px);
-                margin: 0 8px;
-            }
+#prayerForm .form-group:focus-within > label {
+  color: #8a6418;
+}
 
-            h1 {
-                font-size: 2rem;
-            }
+#prayerForm .form-group:focus-within > label::before {
+  scale: 1.35;
+  rotate: 90deg;
+  box-shadow:
+    0 0 0 4px rgba(245, 196, 81, 0.22),
+    0 0 12px rgba(245, 196, 81, 0.7);
+}
 
-            .subtitle {
-                font-size: 1rem;
-            }
-        }
+/* background-color (not the shorthand) so the select chevron survives every state */
+#prayerForm :is(input, select, textarea) {
+  display: block;
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0.85rem 1.1rem;
+  border: 1.5px solid rgba(31, 35, 64, 0.14);
+  border-radius: var(--radius-sm);
+  background-color: var(--paper);
+  color: var(--text);
+  font: 400 1.02rem/1.4 var(--font-body);
+  box-shadow: inset 0 1px 2px rgba(11, 16, 38, 0.05);
+  transition:
+    border-color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out),
+    background-color 0.3s var(--ease-out);
+}
+
+#prayerForm :is(input, textarea)::placeholder {
+  color: #6b7090;
+  opacity: 1;
+}
+
+#prayerForm select {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: 2.75rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--gold-deep) 50%),
+    linear-gradient(135deg, var(--gold-deep) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.35rem) 50%,
+    calc(100% - 1rem) 50%;
+  background-size: 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+#prayerForm select:invalid {
+  color: var(--muted);
+}
+
+#prayerForm option {
+  color: var(--text);
+  background-color: var(--paper);
+}
+
+#prayerForm textarea {
+  min-height: 9.5rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+#prayerForm :is(input, select, textarea):focus {
+  border-color: var(--gold-2);
+  box-shadow: 0 0 0 4px rgba(245, 196, 81, 0.25);
+}
+
+#prayerForm :is(input, select, textarea):focus-visible {
+  outline-color: var(--gold-deep);
+  outline-offset: 2px;
+}
+
+#prayerForm :is(input, select, textarea).ng-valid.ng-dirty:not(:focus) {
+  border-color: rgba(228, 176, 74, 0.55);
+}
+
+/* ---------- Submit button ---------- */
+
+#submitButton {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 3.6rem;
+  margin-top: 0.6rem;
+  padding: 0.95rem 2rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--gold-fill);
+  color: var(--ink);
+  font: 700 1.02rem/1.3 var(--font-display);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: var(--shadow-gold);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    translate 0.3s var(--ease-spring),
+    scale 0.2s var(--ease-out),
+    box-shadow 0.3s var(--ease-out),
+    opacity 0.25s var(--ease-out);
+  animation: haf-fade-up 0.6s var(--ease-out) 0.82s backwards;
+}
+
+#submitButton::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: -1;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: translateX(-130%) skewX(-20deg);
+  pointer-events: none;
+}
+
+#submitButton > i {
+  transition:
+    translate 0.35s var(--ease-spring),
+    rotate 0.35s var(--ease-spring);
+}
+
+#submitButton:active:not(:disabled) {
+  scale: 0.97;
+}
+
+#submitButton:focus-visible {
+  outline-color: var(--gold-deep);
+}
+
+#submitButton:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+#submitButton[aria-busy='true']::before {
+  content: '';
+  flex: none;
+  width: 1.05em;
+  height: 1.05em;
+  border: 2px solid rgba(11, 16, 38, 0.25);
+  border-top-color: var(--ink);
+  border-radius: 50%;
+  animation: haf-spin 0.8s linear infinite;
+}
+
+/* ---------- Toasts (shown 3s, .hide added at 3s, removed at 3.3s) ---------- */
+
+.toast-container {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(1rem, 3vw, 1.75rem);
+  z-index: 2100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(92vw, 30rem);
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.95rem 1.2rem;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  font: 700 1rem/1.45 var(--font-body);
+  box-shadow:
+    0 24px 48px -18px rgba(11, 16, 38, 0.55),
+    0 4px 12px rgba(11, 16, 38, 0.12);
+  pointer-events: none;
+  animation: haf-toast-in 0.45s var(--ease-spring) backwards;
+}
+
+.toast span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.toast i {
+  flex: none;
+  font-size: 1.35rem;
+  animation: haf-pop 0.5s var(--ease-out) 0.15s backwards;
+}
+
+/* Countdown bar matching the 3s auto-hide */
+.toast::after {
+  content: '';
+  position: absolute;
+  left: 1.2rem;
+  right: 1.2rem;
+  bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  transform-origin: left;
+  opacity: 0.6;
+  animation: prayer-toast-timer 3s linear forwards;
+  pointer-events: none;
+}
+
+.toast.success {
+  border-color: rgba(245, 196, 81, 0.55);
+  background: linear-gradient(135deg, var(--ink-2), var(--ink));
+  color: var(--cream);
+  box-shadow:
+    0 24px 48px -18px rgba(11, 16, 38, 0.55),
+    0 4px 12px rgba(11, 16, 38, 0.12),
+    0 0 0 4px rgba(245, 196, 81, 0.12);
+}
+
+.toast.success i {
+  color: var(--gold);
+}
+
+.toast.success::after {
+  background: var(--gold-fill);
+}
+
+.toast.error {
+  border-color: rgba(180, 35, 24, 0.45);
+  background: #fff1f0;
+  color: #7a1a12;
+}
+
+.toast.error i {
+  color: #b42318;
+}
+
+.toast.error::after {
+  background: #b42318;
+}
+
+.toast.hide {
+  animation: prayer-toast-out 0.3s var(--ease-out) forwards;
+}
+
+/* ---------- Pointer hover effects ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .verse:hover {
+    border-color: rgba(228, 176, 74, 0.35);
+    background-color: rgba(255, 244, 207, 0.55);
+    box-shadow: 0 10px 24px -16px rgba(184, 134, 43, 0.55);
+  }
+
+  .verse:hover::before {
+    scale: 1.25;
+    box-shadow:
+      0 0 0 5px rgba(245, 196, 81, 0.22),
+      0 0 14px rgba(245, 196, 81, 0.75);
+  }
+
+  .verse:hover > :is(.verse-number, .verse-text) {
+    translate: 3px 0;
+  }
+
+  .verse:hover > .verse-number::after {
+    scale: 1.8 1;
+  }
+
+  .method-btn:not(.active):hover {
+    background-color: rgba(255, 244, 207, 0.7);
+    color: var(--ink);
+  }
+
+  .method-btn:hover > i {
+    scale: 1.2;
+    rotate: -10deg;
+  }
+
+  #prayerForm :is(input, select, textarea):hover:not(:focus) {
+    border-color: rgba(228, 176, 74, 0.6);
+  }
+
+  #submitButton:hover:not(:disabled) {
+    translate: 0 -2px;
+    box-shadow: 0 20px 44px -14px rgba(245, 196, 81, 0.75);
+  }
+
+  #submitButton:hover:not(:disabled)::after {
+    animation: haf-sweep 0.9s var(--ease-out);
+  }
+
+  #submitButton:hover:not(:disabled) > i {
+    translate: 4px 0;
+    rotate: -12deg;
+  }
+
+  .form-container::after {
+    animation: haf-glow 7s ease-in-out infinite;
+  }
+}
+
+/* ---------- Validation errors (after hover so they always win) ---------- */
+
+#prayerForm :is(input, select, textarea).ng-invalid.ng-touched {
+  border-color: #b42318;
+  background-color: #fff8f7;
+  box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12);
+}
+
+/* Native state (e.g. malformed email); empty fields are left to Angular's touched state */
+#prayerForm :is(input, textarea):user-invalid:not(:placeholder-shown) {
+  border-color: #b42318;
+  background-color: #fff8f7;
+  box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12);
+}
+
+#prayerForm .form-group:has(> .ng-invalid.ng-touched) > label {
+  color: #b42318;
+}
+
+/* ---------- Sliding toggle indicator ---------- */
+
+@supports selector(:has(*)) {
+  .request-method-buttons::before {
+    content: '';
+    position: absolute;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    left: 0.35rem;
+    z-index: -1;
+    width: calc((100% - 1.05rem) / 2);
+    border-radius: 999px;
+    background: var(--gold-fill);
+    box-shadow: var(--shadow-gold);
+    transition: translate 0.5s var(--ease-out);
+    pointer-events: none;
+  }
+
+  .request-method-buttons:has(> .method-btn + .method-btn.active)::before {
+    translate: calc(100% + 0.35rem) 0;
+  }
+
+  .method-btn.active {
+    background: transparent;
+    box-shadow: none;
+  }
+}
+
+/* ---------- Telugu ---------- */
+
+html[lang='te'] .form-container > h1 {
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html[lang='te'] .method-btn,
+html[lang='te'] #submitButton {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html[lang='te'] .verse-number {
+  font-size: 0.86rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html[lang='te'] .verse-text {
+  font-style: normal;
+  line-height: 1.85;
+}
+
+html[lang='te'] .form-container > .subtitle {
+  font-style: normal;
+}
+
+/* ---------- Local keyframes ---------- */
+
+@keyframes prayer-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+
+@keyframes prayer-toast-timer {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1024px) {
+  :is(haf-prayer-request-en, haf-prayer-request-te) > .container {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .verses-sidebar,
+  .form-container {
+    justify-self: center;
+    width: 100%;
+    max-width: 760px;
+  }
+
+  /* Form first on narrow screens; the sidebar holds no focusable content */
+  .verses-sidebar {
+    order: 2;
+    animation-name: haf-fade-up;
+  }
+}
+
+@media (max-width: 768px) {
+  :is(haf-prayer-request-en, haf-prayer-request-te) > .container::before,
+  :is(haf-prayer-request-en, haf-prayer-request-te) > .container::after {
+    border-radius: 0 0 50% 50% / 0 0 28px 28px;
+  }
+
+  /* Clear the back-to-top button */
+  .toast-container {
+    bottom: 5.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .request-method-buttons {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: 1fr;
+    border-radius: 1.4rem;
+  }
+
+  .method-btn {
+    border-radius: 1.1rem;
+  }
+
+  @supports selector(:has(*)) {
+    .request-method-buttons::before {
+      right: 0.35rem;
+      bottom: auto;
+      width: auto;
+      height: calc((100% - 1.05rem) / 2);
+      border-radius: 1.1rem;
+    }
+
+    .request-method-buttons:has(> .method-btn + .method-btn.active)::before {
+      translate: 0 calc(100% + 0.35rem);
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .form-container > h1 {
+    font-size: 1.9rem;
+  }
+
+  .verses-sidebar {
+    --prayer-rail: 1.15rem;
+    padding: 1.35rem 1rem;
+  }
+
+  .verse {
+    padding: 0.9rem 0.85rem 0.9rem 2.4rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .form-container > h1 {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .request-method-buttons::before {
+    display: none;
+  }
+
+  .method-btn.active {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+}
